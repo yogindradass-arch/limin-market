@@ -32,11 +32,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (authError) {
         setError(authError.message);
       } else {
-        if (mode === 'signup') {
-          setError('Check your email for the confirmation link!');
-        } else {
-          onClose();
-        }
+        // Success! Close the modal
+        onClose();
       }
     } catch (err) {
       setError('An unexpected error occurred');
