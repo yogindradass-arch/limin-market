@@ -332,7 +332,7 @@ export default function App() {
             </div>
             {allProducts.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
-                {getFilteredProducts(allProducts).slice(0, 10).map(p => (
+                {allProducts.slice(0, 10).map(p => (
                   <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
                 ))}
               </div>
