@@ -192,6 +192,17 @@ export default function App() {
     }
   };
 
+  const handleEditListing = (productId: string) => {
+    // Find the product to edit
+    const productToEdit = products.find(p => p.id === productId);
+    if (productToEdit) {
+      // TODO: Implement edit functionality
+      // For now, just show alert
+      alert('Edit functionality coming soon! Product ID: ' + productId);
+      console.log('Editing product:', productToEdit);
+    }
+  };
+
   const handleDeleteListing = async (productId: string) => {
     try {
       const { error } = await supabase
@@ -535,11 +546,12 @@ export default function App() {
 
       {selectedProduct && (
         <ProductDetailModal
-          product={selectedProduct}
+          product={{...selectedProduct, isFavorited: favorites.has(selectedProduct.id)}}
           isOpen={true}
           onClose={closeModal}
           onFavoriteToggle={toggleFav}
           onDelete={handleDeleteListing}
+          onEdit={handleEditListing}
         />
       )}
 

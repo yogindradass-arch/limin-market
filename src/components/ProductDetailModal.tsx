@@ -8,9 +8,10 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onFavoriteToggle?: (productId: string) => void;
   onDelete?: (productId: string) => void;
+  onEdit?: (productId: string) => void;
 }
 
-export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit }: ProductDetailModalProps) {
   const { user } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -21,6 +22,13 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
   const handleDelete = () => {
     if (onDelete) {
       onDelete(product.id);
+      onClose();
+    }
+  };
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(product.id);
       onClose();
     }
   };
@@ -130,46 +138,67 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
               {/* Seller Info */}
               <div className="border-t pt-6">
                 <h3 className="text-lg font-semibold text-limin-dark mb-3">Seller Information</h3>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-limin-primary flex items-center justify-center text-white font-bold text-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-limin-primary to-orange-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
                     {product.seller.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-medium text-limin-dark">{product.seller}</div>
-                    <div className="text-sm text-gray-600">Member since 2024</div>
+                    <div className="font-semibold text-limin-dark text-lg">{product.seller}</div>
+                    <div className="text-sm text-gray-600 flex items-center gap-1">
+                      <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Verified Seller</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                {/* Contact Button */}
-                <a
-                  href={`tel:${product.sellerPhone}`}
-                  className="w-full bg-limin-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  Call {product.sellerPhone}
-                </a>
-
-                {/* Delete Button (only for owner) */}
-                {isOwner && !showDeleteConfirm && (
-                  <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="w-full border-2 border-red-500 text-red-500 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                {/* Contact Button - only show if not owner */}
+                {!isOwner && (
+                  <a
+                    href={`tel:${product.sellerPhone}`}
+                    className="w-full bg-limin-primary text-white py-4 rounded-xl font-semibold text-lg hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    Delete Listing
-                  </button>
+                    Call Seller
+                  </a>
+                )}
+
+                {/* Owner Actions */}
+                {isOwner && !showDeleteConfirm && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Edit Button */}
+                    <button
+                      onClick={handleEdit}
+                      className="border-2 border-limin-primary text-limin-primary py-3 rounded-xl font-semibold hover:bg-limin-primary hover:text-white transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit
+                    </button>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="border-2 border-red-500 text-red-500 py-3 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </button>
+                  </div>
                 )}
 
                 {/* Delete Confirmation */}
                 {isOwner && showDeleteConfirm && (
-                  <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 space-y-3">
+                  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 space-y-3">
                     <p className="text-red-800 font-medium text-center">Are you sure you want to delete this listing?</p>
                     <div className="flex gap-3">
                       <button
