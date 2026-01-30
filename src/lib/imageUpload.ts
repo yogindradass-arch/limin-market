@@ -36,7 +36,7 @@ export async function uploadProductImage(file: File): Promise<{ url: string | nu
 
     if (uploadError) {
       console.error('Upload error:', uploadError);
-      return { url: null, error: 'Failed to upload image' };
+      return { url: null, error: `Upload failed: ${uploadError.message}` };
     }
 
     // Get public URL
