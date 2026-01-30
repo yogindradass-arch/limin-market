@@ -12,7 +12,7 @@ export default function SearchModal({ isOpen, onClose, products, onProductClick 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 10000 });
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 });
 
   if (!isOpen) return null;
 
@@ -36,7 +36,7 @@ export default function SearchModal({ isOpen, onClose, products, onProductClick 
     setSearchQuery('');
     setSelectedCategory('');
     setSelectedLocation('');
-    setPriceRange({ min: 0, max: 10000 });
+    setPriceRange({ min: 0, max: 1000000 });
   };
 
   return (

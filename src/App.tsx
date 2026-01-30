@@ -57,6 +57,7 @@ export default function App() {
         return;
       }
 
+      console.log('✅ Fetched products from database:', data?.length || 0, 'products');
       if (data) {
         // Transform database format to Product type
         const transformedProducts: Product[] = data.map(item => {
@@ -94,6 +95,7 @@ export default function App() {
           };
         });
 
+        console.log('✅ Setting products state with', transformedProducts.length, 'products');
         setProducts(transformedProducts);
       }
     } catch (error) {
@@ -159,9 +161,13 @@ export default function App() {
       }
 
       if (data) {
+        console.log('✅ Listing posted successfully:', data);
         alert('Listing posted successfully!');
         setShowPostForm(false);
+        // Reset filter to "All" so user can see their new listing
+        setActiveFilter('All');
         // Refresh products list
+        console.log('🔄 Refreshing products list...');
         fetchProducts();
       }
     } catch (error) {
@@ -277,7 +283,7 @@ export default function App() {
     }
 
     // Default home tab content
-    const hasAnyProducts = filteredHotDeals.length > 0 || filteredDollarItems.length > 0 || filteredFreeItems.length > 0;
+    const hasAnyProducts = allProducts.length > 0 || filteredHotDeals.length > 0 || filteredDollarItems.length > 0 || filteredFreeItems.length > 0;
 
     if (!hasAnyProducts) {
       return (
@@ -330,16 +336,20 @@ export default function App() {
                 <span className="text-2xl mr-2">🆕</span>Recently Posted
               </h2>
             </div>
-            {allProducts.length > 0 ? (
+            {getFilteredProducts(allProducts).length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
-                {allProducts.slice(0, 10).map(p => (
+                {getFilteredProducts(allProducts).slice(0, 10).map(p => (
                   <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
                 ))}
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">📦</div>
-                <p className="text-sm text-gray-600">No listings yet. Be the first to post!</p>
+                <p className="text-sm text-gray-600">
+                  {allProducts.length > 0
+                    ? `No items match the "${activeFilter}" filter. Try selecting "All" to see all listings.`
+                    : "No listings yet. Be the first to post!"}
+                </p>
               </div>
             )}
           </section>
@@ -368,7 +378,11 @@ export default function App() {
             ) : (
               <div className="bg-white rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">💸</div>
-                <p className="text-sm text-gray-600">No affordable items yet. Post budget-friendly deals!</p>
+                <p className="text-sm text-gray-600">
+                  {allProducts.length > 0 && activeFilter !== 'All'
+                    ? `No items under $50 match the "${activeFilter}" filter.`
+                    : "No affordable items yet. Post budget-friendly deals!"}
+                </p>
               </div>
             )}
           </section>
@@ -391,7 +405,11 @@ export default function App() {
             ) : (
               <div className="bg-white rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">🎁</div>
-                <p className="text-sm text-gray-600">No free items yet. Share things you want to give away!</p>
+                <p className="text-sm text-gray-600">
+                  {allProducts.length > 0 && activeFilter !== 'All'
+                    ? `No free items match the "${activeFilter}" filter.`
+                    : "No free items yet. Share things you want to give away!"}
+                </p>
               </div>
             )}
           </section>
