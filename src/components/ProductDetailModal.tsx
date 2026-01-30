@@ -10,9 +10,11 @@ interface ProductDetailModalProps {
   onDelete?: (productId: string) => void;
   onEdit?: (productId: string) => void;
   onReport?: (productId: string, reason: string) => void;
+  onMarkAsSold?: (productId: string) => void;
+  onExtendListing?: (productId: string) => void;
 }
 
-export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit, onReport }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit, onReport, onMarkAsSold, onExtendListing }: ProductDetailModalProps) {
   const { user } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -44,6 +46,31 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
       alert('Thank you for your report. We will review it shortly.');
     }
   };
+
+  const handleMarkAsSold = () => {
+    if (onMarkAsSold) {
+      onMarkAsSold(product.id);
+    }
+  };
+
+  const handleExtendListing = () => {
+    if (onExtendListing) {
+      onExtendListing(product.id);
+    }
+  };
+
+  // Calculate days until expiration
+  const getDaysUntilExpiration = () => {
+    if (!product.expiresAt) return null;
+    const now = new Date();
+    const expiresAt = new Date(product.expiresAt);
+    const diffMs = expiresAt.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const daysUntilExpiration = getDaysUntilExpiration();
+  const isExpiringSoon = daysUntilExpiration !== null && daysUntilExpiration <= 7 && daysUntilExpiration > 0;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -166,6 +193,22 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                 </div>
               </div>
 
+              {/* Expiration Warning - only show to owner if expiring soon */}
+              {isOwner && isExpiringSoon && (
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">⏰</div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-yellow-900 mb-1">Listing Expiring Soon</h4>
+                      <p className="text-sm text-yellow-800">
+                        This listing will expire in <strong>{daysUntilExpiration} {daysUntilExpiration === 1 ? 'day' : 'days'}</strong>.
+                        Extend it to keep it active for another 30 days.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="space-y-3">
                 {/* Contact Button - only show if not owner */}
@@ -196,29 +239,55 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
 
                 {/* Owner Actions */}
                 {isOwner && !showDeleteConfirm && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* Edit Button */}
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Edit Button */}
+                      <button
+                        onClick={handleEdit}
+                        className="border-2 border-limin-primary text-limin-primary py-3 rounded-xl font-semibold hover:bg-limin-primary hover:text-white transition-all flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                      </button>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="border-2 border-red-500 text-red-500 py-3 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
+
+                    {/* Mark as Sold Button */}
                     <button
-                      onClick={handleEdit}
-                      className="border-2 border-limin-primary text-limin-primary py-3 rounded-xl font-semibold hover:bg-limin-primary hover:text-white transition-all flex items-center justify-center gap-2"
+                      onClick={handleMarkAsSold}
+                      className="w-full bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition-all flex items-center justify-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Edit
+                      Mark as Sold
                     </button>
 
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => setShowDeleteConfirm(true)}
-                      className="border-2 border-red-500 text-red-500 py-3 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Delete
-                    </button>
-                  </div>
+                    {/* Extend Listing Button - show if expiring soon */}
+                    {isExpiringSoon && (
+                      <button
+                        onClick={handleExtendListing}
+                        className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Extend Listing (30 days)
+                      </button>
+                    )}
+                  </>
                 )}
 
                 {/* Delete Confirmation */}

@@ -9,8 +9,11 @@ export interface Product {
   sellerPhone: string;
   location: string;
   timeAgo: string;
-  listingType?: 'wholesale' | 'local';
+  listingType?: 'wholesale' | 'local' | 'standard';
   isFavorited?: boolean;
   category?: string;
   description?: string;
+  status?: 'active' | 'sold' | 'expired';
+  expiresAt?: string;
+  createdAt?: string;
 }

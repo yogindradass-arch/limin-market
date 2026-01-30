@@ -51,7 +51,7 @@ export default function App() {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('is_active', true)
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -90,11 +90,14 @@ export default function App() {
             seller: item.seller_name,
             sellerId: item.seller_id,
             sellerPhone: item.seller_phone,
-            listingType: item.listing_type as 'wholesale' | 'local',
+            listingType: item.listing_type as 'wholesale' | 'local' | 'standard',
             image: item.image_url,
             isFavorited: false,
             rating: 0, // Can be calculated later based on reviews
             timeAgo,
+            status: item.status || 'active',
+            expiresAt: item.expires_at,
+            createdAt: item.created_at,
           };
         });
 
@@ -138,6 +141,10 @@ export default function App() {
         return;
       }
 
+      // Calculate expiration date (30 days from now)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+
       const { data, error } = await supabase
         .from('products')
         .insert([
@@ -153,6 +160,8 @@ export default function App() {
             image_url: listingData.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500',
             is_active: true,
             seller_id: user.id,
+            status: 'active',
+            expires_at: expiresAt.toISOString(),
           },
         ])
         .select();
@@ -294,6 +303,70 @@ export default function App() {
     } catch (error) {
       console.error('Error reporting listing:', error);
       alert('Failed to submit report. Please try again.');
+    }
+  };
+
+  const handleMarkAsSold = async (productId: string) => {
+    if (!user) {
+      alert('You must be logged in to mark a listing as sold');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ status: 'sold' })
+        .eq('id', productId)
+        .eq('seller_id', user.id);
+
+      if (error) {
+        console.error('Error marking as sold:', error);
+        alert('Failed to mark listing as sold. Please try again.');
+        return;
+      }
+
+      console.log('✅ Listing marked as sold:', productId);
+      alert('Listing marked as sold! It will no longer appear in search results.');
+      closeModal();
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error marking as sold:', error);
+      alert('Failed to mark listing as sold. Please try again.');
+    }
+  };
+
+  const handleExtendListing = async (productId: string) => {
+    if (!user) {
+      alert('You must be logged in to extend a listing');
+      return;
+    }
+
+    try {
+      // Extend listing by 30 days from now
+      const newExpiresAt = new Date();
+      newExpiresAt.setDate(newExpiresAt.getDate() + 30);
+
+      const { error } = await supabase
+        .from('products')
+        .update({
+          expires_at: newExpiresAt.toISOString(),
+          status: 'active'
+        })
+        .eq('id', productId)
+        .eq('seller_id', user.id);
+
+      if (error) {
+        console.error('Error extending listing:', error);
+        alert('Failed to extend listing. Please try again.');
+        return;
+      }
+
+      console.log('✅ Listing extended:', productId);
+      alert('Listing extended for another 30 days!');
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error extending listing:', error);
+      alert('Failed to extend listing. Please try again.');
     }
   };
 
@@ -621,6 +694,8 @@ export default function App() {
           onDelete={handleDeleteListing}
           onEdit={handleEditListing}
           onReport={handleReportListing}
+          onMarkAsSold={handleMarkAsSold}
+          onExtendListing={handleExtendListing}
         />
       )}
 

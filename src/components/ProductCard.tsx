@@ -20,6 +20,19 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
     }
   };
 
+  // Calculate if listing is expiring soon
+  const getDaysUntilExpiration = () => {
+    if (!product.expiresAt) return null;
+    const now = new Date();
+    const expiresAt = new Date(product.expiresAt);
+    const diffMs = expiresAt.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const daysUntilExpiration = getDaysUntilExpiration();
+  const isExpiringSoon = daysUntilExpiration !== null && daysUntilExpiration <= 7 && daysUntilExpiration > 0;
+
   return (
     <div
       onClick={handleClick}
@@ -34,20 +47,27 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
         />
 
         {/* Badges */}
-        {product.listingType && (
-          <div className="absolute top-2 left-2">
-            {product.listingType === 'wholesale' && (
-              <span className="bg-limin-primary text-white text-xs font-bold px-2 py-1 rounded">
-                WHOLESALE
-              </span>
-            )}
-            {product.listingType === 'local' && (
-              <span className="bg-limin-secondary text-white text-xs font-bold px-2 py-1 rounded">
-                LOCAL
-              </span>
-            )}
-          </div>
-        )}
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {product.listingType && (
+            <>
+              {product.listingType === 'wholesale' && (
+                <span className="bg-limin-primary text-white text-xs font-bold px-2 py-1 rounded">
+                  WHOLESALE
+                </span>
+              )}
+              {product.listingType === 'local' && (
+                <span className="bg-limin-secondary text-white text-xs font-bold px-2 py-1 rounded">
+                  LOCAL
+                </span>
+              )}
+            </>
+          )}
+          {isExpiringSoon && (
+            <span className="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+              ⏰ {daysUntilExpiration}d left
+            </span>
+          )}
+        </div>
 
         {/* Heart/Favorite Icon */}
         <button
