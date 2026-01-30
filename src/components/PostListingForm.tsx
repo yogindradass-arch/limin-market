@@ -121,6 +121,12 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
     }
   };
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
@@ -131,6 +137,20 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
     if (totalImages > 2) {
       setErrors(prev => ({ ...prev, image: 'Maximum 2 images allowed' }));
       return;
+    }
+
+    // Validate each file
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        setErrors(prev => ({ ...prev, image: `"${file.name}" is not an image file` }));
+        return;
+      }
+      if (file.size > maxSize) {
+        const actualSize = formatFileSize(file.size);
+        setErrors(prev => ({ ...prev, image: `"${file.name}" is ${actualSize}. Max size is 5 MB. Please compress or choose a smaller image.` }));
+        return;
+      }
     }
 
     // Add new files
@@ -360,6 +380,11 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
                         alt={`Preview ${index + 1}`}
                         className="w-full h-40 object-cover rounded-lg"
                       />
+                      {/* File size badge */}
+                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded">
+                        {formatFileSize(imageFiles[index]?.size || 0)}
+                      </div>
+                      {/* Remove button */}
                       <button
                         type="button"
                         onClick={() => removeImage(index)}

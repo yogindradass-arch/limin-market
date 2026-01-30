@@ -1,15 +1,24 @@
 import { supabase } from './supabase';
 
+// Helper function to format file size
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 export async function uploadProductImage(file: File): Promise<{ url: string | null; error: string | null }> {
   try {
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      return { url: null, error: 'Please select an image file' };
+      return { url: null, error: `File "${file.name}" is not an image. Please select a JPG, PNG, or other image file.` };
     }
 
     // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return { url: null, error: 'Image must be less than 5MB' };
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      const actualSize = formatFileSize(file.size);
+      return { url: null, error: `Image "${file.name}" is ${actualSize}. Maximum size is 5 MB. Please compress or choose a smaller image.` };
     }
 
     // Create unique filename
