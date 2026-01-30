@@ -16,12 +16,11 @@ import EmptyState from './components/EmptyState';
 import AboutModal from './components/AboutModal';
 import SettingsModal from './components/SettingsModal';
 import { supabase } from './lib/supabase';
-// import { useAuth } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 import type { Product } from './types/product';
 
 export default function App() {
-  // const { user } = useAuth(); // Disabled until Supabase is configured
-  const user = null; // Temporary - will use real auth once Supabase is set up
+  const { user, signOut } = useAuth();
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeTab, setActiveTab] = useState('home');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -126,8 +125,13 @@ export default function App() {
 
   const handlePostListing = async (listingData: ListingFormData) => {
     try {
-      // For now, we'll allow posting without authentication
-      // In production, you'd require user to be logged in
+      // Require authentication for posting
+      if (!user) {
+        alert('Please sign in to post a listing');
+        setShowAuth(true);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('products')
         .insert([
@@ -137,12 +141,12 @@ export default function App() {
             price: listingData.price,
             category: listingData.category,
             location: listingData.location,
-            seller_name: 'Seller', // Will use real name when auth is enabled
+            seller_name: user.email?.split('@')[0] || 'Seller',
             seller_phone: listingData.phone,
             listing_type: listingData.listingType || 'standard',
             image_url: listingData.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500',
             is_active: true,
-            seller_id: null, // Will be set when auth is enabled
+            seller_id: user.id,
           },
         ])
         .select();

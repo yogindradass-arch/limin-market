@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -7,11 +8,19 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose, onAuthClick }: SettingsModalProps) {
+  const { user, signOut } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [showPhone, setShowPhone] = useState(true);
 
   if (!isOpen) return null;
+
+  const handleSignOut = async () => {
+    if (confirm('Are you sure you want to sign out?')) {
+      await signOut();
+      onClose();
+    }
+  };
 
   const handleToggleNotifications = () => {
     const newValue = !notifications;
@@ -74,13 +83,30 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
               <h3 className="text-lg font-bold text-limin-dark mb-4">Account</h3>
               <div className="bg-gray-50 rounded-xl p-4 text-center">
                 <div className="text-4xl mb-2">👤</div>
-                <p className="text-sm text-gray-600 mb-3">Not signed in</p>
-                <button
-                  onClick={handleSignIn}
-                  className="text-sm text-limin-primary font-semibold hover:underline"
-                >
-                  Sign In / Sign Up
-                </button>
+                {user ? (
+                  <>
+                    <p className="text-sm font-medium text-gray-900 mb-1">{user.email}</p>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Member since {new Date(user.created_at).toLocaleDateString()}
+                    </p>
+                    <button
+                      onClick={handleSignOut}
+                      className="text-sm text-red-600 font-semibold hover:underline"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-600 mb-3">Not signed in</p>
+                    <button
+                      onClick={handleSignIn}
+                      className="text-sm text-limin-primary font-semibold hover:underline"
+                    >
+                      Sign In / Sign Up
+                    </button>
+                  </>
+                )}
               </div>
             </section>
 

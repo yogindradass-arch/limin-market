@@ -1,5 +1,5 @@
 import { useState } from 'react';
-// import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -15,10 +15,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // const { signIn, signUp } = useAuth();
-  // Temporary mock functions until Supabase is configured
-  // const signIn = async () => ({ error: null });
-  // const signUp = async () => ({ error: null });
+  const { signIn, signUp, signInWithProvider } = useAuth();
 
   if (!isOpen) return null;
 
@@ -28,25 +25,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setLoading(true);
 
     try {
-      // Temporary demo mode message
-      setError('Authentication is disabled in demo mode. Set up Supabase to enable login/signup!');
-      setLoading(false);
-      return;
+      const { error: authError } = mode === 'signin'
+        ? await signIn(email, password)
+        : await signUp(email, password);
 
-      // Real auth code (will be enabled after Supabase setup)
-      // const { error: authError } = mode === 'signin'
-      //   ? await signIn(email, password)
-      //   : await signUp(email, password);
-      //
-      // if (authError) {
-      //   setError(authError.message);
-      // } else {
-      //   if (mode === 'signup') {
-      //     setError('Check your email for the confirmation link!');
-      //   } else {
-      //     onClose();
-      //   }
-      // }
+      if (authError) {
+        setError(authError.message);
+      } else {
+        if (mode === 'signup') {
+          setError('Check your email for the confirmation link!');
+        } else {
+          onClose();
+        }
+      }
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {
@@ -166,7 +157,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => alert('Google OAuth not configured yet. Set up in Supabase dashboard!')}
+                onClick={async () => {
+                  const { error } = await signInWithProvider('google');
+                  if (error) {
+                    setError('Google sign-in is not configured. Enable it in your Supabase dashboard under Authentication > Providers.');
+                  }
+                }}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
