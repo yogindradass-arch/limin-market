@@ -56,8 +56,8 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
 
   const [isFree, setIsFree] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,21 +71,23 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    if (!imageFile && !formData.image.trim()) newErrors.image = 'Please select an image';
+    if (imageFiles.length === 0 && !formData.image.trim()) newErrors.image = 'Please select at least one image';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    // Upload image if a file was selected
+    // Upload images if files were selected
     let imageUrl = formData.image;
-    if (imageFile) {
+    if (imageFiles.length > 0) {
       setUploadingImage(true);
-      const { url, error } = await uploadProductImage(imageFile);
-      setUploadingImage(false);
+
+      // Upload first image (primary image)
+      const { url, error } = await uploadProductImage(imageFiles[0]);
 
       if (error) {
+        setUploadingImage(false);
         setErrors(prev => ({ ...prev, image: error }));
         return;
       }
@@ -93,6 +95,16 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
       if (url) {
         imageUrl = url;
       }
+
+      // If there's a second image, upload it too
+      // For now we'll just use the first image in the listing
+      // You can extend the database schema later to support multiple images
+      if (imageFiles.length > 1) {
+        // Upload second image (currently not stored in database, but uploaded to storage)
+        await uploadProductImage(imageFiles[1]);
+      }
+
+      setUploadingImage(false);
     }
 
     onSubmit({
@@ -110,22 +122,43 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
+    const files = Array.from(e.target.files || []);
 
-      // Create preview
+    if (files.length === 0) return;
+
+    // Check if adding these files would exceed the limit
+    const totalImages = imageFiles.length + files.length;
+    if (totalImages > 2) {
+      setErrors(prev => ({ ...prev, image: 'Maximum 2 images allowed' }));
+      return;
+    }
+
+    // Add new files
+    const newFiles = [...imageFiles, ...files].slice(0, 2);
+    setImageFiles(newFiles);
+
+    // Create previews for all images
+    const newPreviews: string[] = [];
+    newFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        newPreviews.push(reader.result as string);
+        if (newPreviews.length === newFiles.length) {
+          setImagePreviews(newPreviews);
+        }
       };
       reader.readAsDataURL(file);
+    });
 
-      // Clear error
-      if (errors.image) {
-        setErrors(prev => ({ ...prev, image: '' }));
-      }
+    // Clear error
+    if (errors.image) {
+      setErrors(prev => ({ ...prev, image: '' }));
     }
+  };
+
+  const removeImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -314,46 +347,61 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Image *
+                Product Images * (Max 2)
               </label>
 
-              {/* Image Preview */}
-              {imagePreview && (
-                <div className="mb-4">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                        aria-label="Remove image"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {/* Upload Button */}
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-sm font-medium text-gray-700">
-                    {imageFile ? 'Change Image' : 'Select Image'}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
-                  />
-                </label>
+              {imageFiles.length < 2 && (
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-700">
+                      {imageFiles.length === 0 ? 'Select Images' : 'Add Another Image'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                  </label>
 
-                {imageFile && (
-                  <span className="text-sm text-gray-600">
-                    {imageFile.name}
+                  <span className="text-xs text-gray-500">
+                    {imageFiles.length}/2 images
                   </span>
-                )}
-              </div>
+                </div>
+              )}
 
               <p className="text-xs text-gray-500 mt-2">
-                Upload a photo of your item (JPG, PNG, max 5MB)
+                Upload photos of your item (JPG, PNG, max 5MB each)
               </p>
 
               {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
