@@ -322,16 +322,31 @@ export default function App() {
 
     return (
       <>
-        {filteredHotDeals.length > 0 ? (
-          <HotDealsSection deals={filteredHotDeals} onDealClick={handleProductClick} />
-        ) : (
-          <div className="px-4 pt-6">
-            <div className="bg-white rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-3">🔥</div>
-              <h3 className="font-bold text-limin-dark mb-2">No Hot Deals Yet</h3>
-              <p className="text-sm text-gray-600">Be the first to post an amazing deal!</p>
+        {/* Recently Posted - Show first for visibility */}
+        <div className="px-4 pt-6">
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-limin-dark flex items-center">
+                <span className="text-2xl mr-2">🆕</span>Recently Posted
+              </h2>
             </div>
-          </div>
+            {allProducts.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {getFilteredProducts(allProducts).slice(0, 10).map(p => (
+                  <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl p-6 text-center">
+                <div className="text-4xl mb-3">📦</div>
+                <p className="text-sm text-gray-600">No listings yet. Be the first to post!</p>
+              </div>
+            )}
+          </section>
+        </div>
+
+        {filteredHotDeals.length > 0 && (
+          <HotDealsSection deals={filteredHotDeals} onDealClick={handleProductClick} />
         )}
 
         <div className="px-4 py-6 space-y-6">
@@ -377,26 +392,6 @@ export default function App() {
               <div className="bg-white rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">🎁</div>
                 <p className="text-sm text-gray-600">No free items yet. Share things you want to give away!</p>
-              </div>
-            )}
-          </section>
-
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-limin-dark flex items-center">
-                <span className="text-2xl mr-2">🆕</span>Recently Posted
-              </h2>
-            </div>
-            {allProducts.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {getFilteredProducts(allProducts).slice(0, 10).map(p => (
-                  <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl p-6 text-center">
-                <div className="text-4xl mb-3">📦</div>
-                <p className="text-sm text-gray-600">No listings yet. Be the first to post!</p>
               </div>
             )}
           </section>
