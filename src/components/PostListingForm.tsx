@@ -3,7 +3,9 @@ import { uploadProductImage } from '../lib/imageUpload';
 
 interface PostListingFormProps {
   onClose: () => void;
-  onSubmit: (listing: ListingFormData) => void;
+  onSubmit: (listing: ListingFormData, productId?: string) => void;
+  initialData?: ListingFormData;
+  productId?: string;
 }
 
 export interface ListingFormData {
@@ -20,7 +22,7 @@ export interface ListingFormData {
 const categories = [
   'Electronics',
   'Fashion',
-  'Home',
+  'Household',
   'Sports',
   'Vehicles',
   'Books',
@@ -42,22 +44,28 @@ const locations = [
   'Other',
 ];
 
-export default function PostListingForm({ onClose, onSubmit }: PostListingFormProps) {
-  const [formData, setFormData] = useState<ListingFormData>({
-    title: '',
-    description: '',
-    price: 0,
-    category: '',
-    location: '',
-    phone: '',
-    listingType: 'standard',
-    image: '',
-  });
+export default function PostListingForm({ onClose, onSubmit, initialData, productId }: PostListingFormProps) {
+  const isEditMode = !!initialData;
 
-  const [isFree, setIsFree] = useState(false);
+  const [formData, setFormData] = useState<ListingFormData>(
+    initialData || {
+      title: '',
+      description: '',
+      price: 0,
+      category: '',
+      location: '',
+      phone: '',
+      listingType: 'standard',
+      image: '',
+    }
+  );
+
+  const [isFree, setIsFree] = useState(initialData ? initialData.price === 0 : false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>(
+    initialData && initialData.image ? [initialData.image] : []
+  );
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,6 +79,7 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    // In edit mode, existing image is okay; in create mode, require new image
     if (imageFiles.length === 0 && !formData.image.trim()) newErrors.image = 'Please select at least one image';
 
     if (Object.keys(newErrors).length > 0) {
@@ -111,7 +120,7 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
       ...formData,
       price: isFree ? 0 : formData.price,
       image: imageUrl,
-    });
+    }, productId);
   };
 
   const handleChange = (field: keyof ListingFormData, value: string | number) => {
@@ -179,6 +188,10 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
   const removeImage = (index: number) => {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    // If removing the only image and it was the existing one, clear formData.image
+    if (imagePreviews.length === 1 && isEditMode) {
+      setFormData(prev => ({ ...prev, image: '' }));
+    }
   };
 
   return (
@@ -188,7 +201,9 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
           {/* Header */}
           <div className="sticky top-0 bg-white border-b px-6 py-4 rounded-t-2xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-limin-dark">Post a Listing</h2>
+              <h2 className="text-2xl font-bold text-limin-dark">
+                {isEditMode ? 'Edit Listing' : 'Post a Listing'}
+              </h2>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -380,10 +395,12 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
                         alt={`Preview ${index + 1}`}
                         className="w-full h-40 object-cover rounded-lg"
                       />
-                      {/* File size badge */}
-                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded">
-                        {formatFileSize(imageFiles[index]?.size || 0)}
-                      </div>
+                      {/* File size badge - only show for new files */}
+                      {imageFiles[index] && (
+                        <div className="absolute bottom-2 left-2 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded">
+                          {formatFileSize(imageFiles[index].size)}
+                        </div>
+                      )}
                       {/* Remove button */}
                       <button
                         type="button"
@@ -446,7 +463,7 @@ export default function PostListingForm({ onClose, onSubmit }: PostListingFormPr
                 disabled={uploadingImage}
                 className="flex-1 px-6 py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {uploadingImage ? 'Uploading Image...' : 'Post Listing'}
+                {uploadingImage ? 'Uploading Image...' : (isEditMode ? 'Update Listing' : 'Post Listing')}
               </button>
             </div>
           </form>

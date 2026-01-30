@@ -27,6 +27,7 @@ export default function App() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showPostForm, setShowPostForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -196,10 +197,48 @@ export default function App() {
     // Find the product to edit
     const productToEdit = products.find(p => p.id === productId);
     if (productToEdit) {
-      // TODO: Implement edit functionality
-      // For now, just show alert
-      alert('Edit functionality coming soon! Product ID: ' + productId);
-      console.log('Editing product:', productToEdit);
+      setEditingProduct(productToEdit);
+      setShowPostForm(true);
+    }
+  };
+
+  const handleUpdateListing = async (listing: ListingFormData, productId?: string) => {
+    if (!user || !productId) {
+      alert('You must be logged in to update a listing');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          title: listing.title,
+          description: listing.description,
+          price: listing.price,
+          category: listing.category,
+          location: listing.location,
+          seller_phone: listing.phone,
+          listing_type: listing.listingType,
+          image: listing.image,
+        })
+        .eq('id', productId)
+        .eq('seller_id', user.id); // Ensure user can only update their own listings
+
+      if (error) {
+        console.error('Error updating listing:', error);
+        alert('Failed to update listing. Please try again.');
+        return;
+      }
+
+      console.log('✅ Product updated:', productId);
+      alert('Listing updated successfully!');
+      setShowPostForm(false);
+      setEditingProduct(null);
+      // Refresh products list
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error updating listing:', error);
+      alert('Failed to update listing. Please try again.');
     }
   };
 
@@ -557,8 +596,22 @@ export default function App() {
 
       {showPostForm && (
         <PostListingForm
-          onClose={() => setShowPostForm(false)}
-          onSubmit={handlePostListing}
+          onClose={() => {
+            setShowPostForm(false);
+            setEditingProduct(null);
+          }}
+          onSubmit={editingProduct ? handleUpdateListing : handlePostListing}
+          initialData={editingProduct ? {
+            title: editingProduct.title,
+            description: editingProduct.description || '',
+            price: editingProduct.price,
+            category: editingProduct.category || '',
+            location: editingProduct.location,
+            phone: editingProduct.sellerPhone,
+            listingType: editingProduct.listingType || 'standard',
+            image: editingProduct.image,
+          } : undefined}
+          productId={editingProduct?.id}
         />
       )}
 
