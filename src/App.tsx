@@ -84,6 +84,7 @@ export default function App() {
             category: item.category,
             location: item.location,
             seller: item.seller_name,
+            sellerId: item.seller_id,
             sellerPhone: item.seller_phone,
             listingType: item.listing_type as 'wholesale' | 'local',
             image: item.image_url,
@@ -174,6 +175,29 @@ export default function App() {
       setShowAuth(true);
     } else {
       setActiveTab(tab);
+    }
+  };
+
+  const handleDeleteListing = async (productId: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId)
+        .eq('seller_id', user?.id); // Ensure user can only delete their own listings
+
+      if (error) {
+        console.error('Error deleting listing:', error);
+        alert('Failed to delete listing. Please try again.');
+        return;
+      }
+
+      alert('Listing deleted successfully!');
+      // Refresh products list
+      fetchProducts();
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      alert('Failed to delete listing. Please try again.');
     }
   };
 
@@ -421,6 +445,7 @@ export default function App() {
           isOpen={true}
           onClose={closeModal}
           onFavoriteToggle={toggleFav}
+          onDelete={handleDeleteListing}
         />
       )}
 

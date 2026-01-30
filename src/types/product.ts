@@ -5,6 +5,7 @@ export interface Product {
   image: string;
   rating: number;
   seller: string;
+  sellerId?: string;
   sellerPhone: string;
   location: string;
   timeAgo: string;

@@ -1,14 +1,29 @@
+import { useState } from 'react';
 import type { Product } from '../types/product';
+import { useAuth } from '../context/AuthContext';
 
 interface ProductDetailModalProps {
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
   onFavoriteToggle?: (productId: string) => void;
+  onDelete?: (productId: string) => void;
 }
 
-export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete }: ProductDetailModalProps) {
+  const { user } = useAuth();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   if (!isOpen || !product) return null;
+
+  const isOwner = user && product.sellerId === user.id;
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(product.id);
+      onClose();
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -126,16 +141,53 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                 </div>
               </div>
 
-              {/* Contact Button */}
-              <a
-                href={`tel:${product.sellerPhone}`}
-                className="w-full bg-limin-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                Call {product.sellerPhone}
-              </a>
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                {/* Contact Button */}
+                <a
+                  href={`tel:${product.sellerPhone}`}
+                  className="w-full bg-limin-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  Call {product.sellerPhone}
+                </a>
+
+                {/* Delete Button (only for owner) */}
+                {isOwner && !showDeleteConfirm && (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full border-2 border-red-500 text-red-500 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Listing
+                  </button>
+                )}
+
+                {/* Delete Confirmation */}
+                {isOwner && showDeleteConfirm && (
+                  <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 space-y-3">
+                    <p className="text-red-800 font-medium text-center">Are you sure you want to delete this listing?</p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        className="flex-1 bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
