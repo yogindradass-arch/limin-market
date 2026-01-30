@@ -9,11 +9,14 @@ interface ProductDetailModalProps {
   onFavoriteToggle?: (productId: string) => void;
   onDelete?: (productId: string) => void;
   onEdit?: (productId: string) => void;
+  onReport?: (productId: string, reason: string) => void;
 }
 
-export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit, onReport }: ProductDetailModalProps) {
   const { user } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
 
   if (!isOpen || !product) return null;
 
@@ -30,6 +33,15 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
     if (onEdit) {
       onEdit(product.id);
       onClose();
+    }
+  };
+
+  const handleReport = () => {
+    if (onReport && reportReason.trim()) {
+      onReport(product.id, reportReason);
+      setShowReportModal(false);
+      setReportReason('');
+      alert('Thank you for your report. We will review it shortly.');
     }
   };
 
@@ -158,15 +170,28 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
               <div className="space-y-3">
                 {/* Contact Button - only show if not owner */}
                 {!isOwner && (
-                  <a
-                    href={`tel:${product.sellerPhone}`}
-                    className="w-full bg-limin-primary text-white py-4 rounded-xl font-semibold text-lg hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    Call Seller
-                  </a>
+                  <>
+                    <a
+                      href={`tel:${product.sellerPhone}`}
+                      className="w-full bg-limin-primary text-white py-4 rounded-xl font-semibold text-lg hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      Call Seller
+                    </a>
+
+                    {/* Report Button */}
+                    <button
+                      onClick={() => setShowReportModal(true)}
+                      className="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:border-red-500 hover:text-red-500 transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      Report Listing
+                    </button>
+                  </>
                 )}
 
                 {/* Owner Actions */}
@@ -212,6 +237,47 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                         className="flex-1 bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors"
                       >
                         Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Report Modal */}
+                {showReportModal && (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 space-y-3">
+                    <h4 className="font-semibold text-gray-900">Report this listing</h4>
+                    <p className="text-sm text-gray-600">Please tell us why you're reporting this listing:</p>
+                    <div className="space-y-2">
+                      {['Inappropriate content', 'Scam or fraud', 'Misleading information', 'Duplicate listing', 'Other'].map((reason) => (
+                        <button
+                          key={reason}
+                          onClick={() => setReportReason(reason)}
+                          className={`w-full text-left px-3 py-2 rounded-lg border-2 transition-colors ${
+                            reportReason === reason
+                              ? 'border-limin-primary bg-limin-primary/10 text-limin-primary font-semibold'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {reason}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                      <button
+                        onClick={() => {
+                          setShowReportModal(false);
+                          setReportReason('');
+                        }}
+                        className="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleReport}
+                        disabled={!reportReason}
+                        className="flex-1 bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Submit Report
                       </button>
                     </div>
                   </div>

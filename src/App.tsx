@@ -268,6 +268,35 @@ export default function App() {
     }
   };
 
+  const handleReportListing = async (productId: string, reason: string) => {
+    if (!user) {
+      alert('You must be logged in to report a listing');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('reports')
+        .insert({
+          product_id: productId,
+          reporter_id: user.id,
+          reason: reason,
+          status: 'pending',
+        });
+
+      if (error) {
+        console.error('Error reporting listing:', error);
+        alert('Failed to submit report. Please try again.');
+        return;
+      }
+
+      console.log('✅ Report submitted for product:', productId);
+    } catch (error) {
+      console.error('Error reporting listing:', error);
+      alert('Failed to submit report. Please try again.');
+    }
+  };
+
   // All products for search (from Supabase)
   const allProducts = products;
 
@@ -591,6 +620,7 @@ export default function App() {
           onFavoriteToggle={toggleFav}
           onDelete={handleDeleteListing}
           onEdit={handleEditListing}
+          onReport={handleReportListing}
         />
       )}
 

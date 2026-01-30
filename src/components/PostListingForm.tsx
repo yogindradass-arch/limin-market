@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { uploadProductImage } from '../lib/imageUpload';
+import { moderateListing } from '../lib/contentModeration';
 
 interface PostListingFormProps {
   onClose: () => void;
@@ -84,6 +85,13 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      return;
+    }
+
+    // Content moderation check
+    const moderationResult = moderateListing(formData.title, formData.description);
+    if (!moderationResult.isAllowed) {
+      alert(moderationResult.message || 'Your listing contains inappropriate content.');
       return;
     }
 

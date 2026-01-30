@@ -16,7 +16,12 @@
       "Bash(gh api:*)",
       "Bash(sudo dscacheutil:*)",
       "Bash(sudo killall:*)",
-      "Bash(dig:*)"
+      "Bash(dig:*)",
+      "Bash(gh auth:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git restore:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill -9)"
     ]
   }
 }
