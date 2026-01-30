@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { uploadProductImage } from '../lib/imageUpload';
 import { moderateListing } from '../lib/contentModeration';
+import { moderateImage } from '../lib/imageModeration';
 
 interface PostListingFormProps {
   onClose: () => void;
@@ -68,6 +69,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
     initialData && initialData.image ? [initialData.image] : []
   );
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [checkingImage, setCheckingImage] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,7 +146,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
     if (files.length === 0) return;
@@ -168,6 +170,32 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
         setErrors(prev => ({ ...prev, image: `"${file.name}" is ${actualSize}. Max size is 5 MB. Please compress or choose a smaller image.` }));
         return;
       }
+    }
+
+    // Check images for inappropriate content
+    setCheckingImage(true);
+    try {
+      for (const file of files) {
+        console.log(`🔍 Checking image: ${file.name}`);
+        const moderationResult = await moderateImage(file);
+
+        if (!moderationResult.isAllowed) {
+          setCheckingImage(false);
+          setErrors(prev => ({
+            ...prev,
+            image: moderationResult.message || 'Image contains inappropriate content and cannot be uploaded.'
+          }));
+          // Reset the file input
+          e.target.value = '';
+          return;
+        }
+      }
+      console.log('✅ All images passed moderation check');
+    } catch (error) {
+      console.error('Error checking image:', error);
+      // Allow upload on error (fail open)
+    } finally {
+      setCheckingImage(false);
     }
 
     // Add new files
@@ -454,6 +482,16 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                 Upload photos of your item (JPG, PNG, max 5MB each)
               </p>
 
+              {checkingImage && (
+                <div className="flex items-center gap-2 mt-2 text-blue-600">
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="text-sm">Checking image for inappropriate content...</span>
+                </div>
+              )}
+
               {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
             </div>
 
@@ -468,10 +506,14 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
               </button>
               <button
                 type="submit"
-                disabled={uploadingImage}
+                disabled={uploadingImage || checkingImage}
                 className="flex-1 px-6 py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {uploadingImage ? 'Uploading Image...' : (isEditMode ? 'Update Listing' : 'Post Listing')}
+                {checkingImage
+                  ? 'Checking Image...'
+                  : uploadingImage
+                  ? 'Uploading Image...'
+                  : (isEditMode ? 'Update Listing' : 'Post Listing')}
               </button>
             </div>
           </form>
