@@ -23,6 +23,7 @@ export default function App() {
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showPostForm, setShowPostForm] = useState(false);
@@ -210,15 +211,23 @@ export default function App() {
   // All products for search (from Supabase)
   const allProducts = products;
 
-  // Filter products based on active filter
+  // Filter products based on active filter and category
   const getFilteredProducts = (products: Product[]) => {
-    if (activeFilter === 'All') return products;
-    if (activeFilter === 'Nearby') return products.filter(p => p.location === currentLocation);
-    if (activeFilter === 'Under $50') return products.filter(p => p.price > 0 && p.price < 50);
-    if (activeFilter === 'Wholesale') return products.filter(p => p.listingType === 'wholesale');
-    if (activeFilter === 'New') return products.slice(0, 6); // Newest items
-    if (activeFilter === 'Top Rated') return products.filter(p => p.rating >= 4.5);
-    return products;
+    let filtered = products;
+
+    // Apply category filter first
+    if (selectedCategory) {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    // Then apply active filter
+    if (activeFilter === 'All') return filtered;
+    if (activeFilter === 'Nearby') return filtered.filter(p => p.location === currentLocation);
+    if (activeFilter === 'Under $50') return filtered.filter(p => p.price > 0 && p.price < 50);
+    if (activeFilter === 'Wholesale') return filtered.filter(p => p.listingType === 'wholesale');
+    if (activeFilter === 'New') return filtered.slice(0, 6); // Newest items
+    if (activeFilter === 'Top Rated') return filtered.filter(p => p.rating >= 4.5);
+    return filtered;
   };
 
   const filteredHotDeals = getFilteredProducts(hotDeals);
@@ -359,6 +368,24 @@ export default function App() {
 
     return (
       <>
+        {/* Category Filter Banner */}
+        {selectedCategory && (
+          <div className="mx-4 mt-4 bg-limin-primary/10 border-2 border-limin-primary rounded-lg p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">📂</span>
+              <span className="font-medium text-limin-dark">
+                Showing: <strong>{selectedCategory}</strong>
+              </span>
+            </div>
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="px-3 py-1 bg-limin-primary text-white text-sm rounded-lg font-medium hover:bg-opacity-90 transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
         {/* Recently Posted - Show first for visibility */}
         <div className="px-4 pt-6">
           <section>
@@ -458,11 +485,20 @@ export default function App() {
               ].map(c => (
                 <button
                   key={c.name}
-                  onClick={() => setShowSearch(true)}
-                  className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedCategory(c.name);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`rounded-lg p-4 text-center hover:shadow-md transition-all cursor-pointer ${
+                    selectedCategory === c.name
+                      ? 'bg-limin-primary text-white shadow-md'
+                      : 'bg-white'
+                  }`}
                 >
                   <div className="text-3xl mb-2">{c.emoji}</div>
-                  <p className="text-sm font-medium text-gray-700">{c.name}</p>
+                  <p className={`text-sm font-medium ${
+                    selectedCategory === c.name ? 'text-white' : 'text-gray-700'
+                  }`}>{c.name}</p>
                 </button>
               ))}
             </div>
@@ -522,6 +558,8 @@ export default function App() {
         onHomeClick={() => {
           setShowMenu(false);
           setActiveTab('home');
+          setSelectedCategory(null);
+          setActiveFilter('All');
         }}
         onFavoritesClick={() => {
           setShowMenu(false);
