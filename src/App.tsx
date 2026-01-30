@@ -478,7 +478,7 @@ export default function App() {
               {[
                 { name: 'Electronics', emoji: '📱' },
                 { name: 'Fashion', emoji: '👕' },
-                { name: 'Home', emoji: '🏠' },
+                { name: 'Household', emoji: '🏠' },
                 { name: 'Sports', emoji: '⚽' },
                 { name: 'Vehicles', emoji: '🚗' },
                 { name: 'Books', emoji: '📚' },
