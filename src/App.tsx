@@ -257,6 +257,37 @@ export default function App() {
       );
     }
 
+    if (activeTab === 'favorites') {
+      const favoritedProducts = allProducts.filter(p => favorites.has(p.id));
+      return (
+        <div className="px-4 py-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-limin-dark mb-2">My Favorites</h2>
+            <p className="text-gray-600">Items you've saved for later</p>
+          </div>
+          {favoritedProducts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-6xl mb-4">❤️</div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No favorites yet</h3>
+              <p className="text-gray-600 mb-6">Start browsing and tap the heart icon on items you love!</p>
+              <button
+                onClick={() => setActiveTab('home')}
+                className="px-6 py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+              >
+                Browse Products
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {favoritedProducts.map(p => (
+                <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
     if (activeTab === 'local') {
       const localProducts = allProducts.filter(p => p.listingType === 'local');
       return (
@@ -425,10 +456,14 @@ export default function App() {
                 { name: 'Vehicles', emoji: '🚗' },
                 { name: 'Books', emoji: '📚' },
               ].map(c => (
-                <div key={c.name} className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                <button
+                  key={c.name}
+                  onClick={() => setShowSearch(true)}
+                  className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
+                >
                   <div className="text-3xl mb-2">{c.emoji}</div>
                   <p className="text-sm font-medium text-gray-700">{c.name}</p>
-                </div>
+                </button>
               ))}
             </div>
           </section>
@@ -484,6 +519,14 @@ export default function App() {
       <SideMenu
         isOpen={showMenu}
         onClose={() => setShowMenu(false)}
+        onHomeClick={() => {
+          setShowMenu(false);
+          setActiveTab('home');
+        }}
+        onFavoritesClick={() => {
+          setShowMenu(false);
+          setActiveTab('favorites');
+        }}
         onAboutClick={() => {
           setShowMenu(false);
           setShowAbout(true);

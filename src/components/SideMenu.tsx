@@ -3,18 +3,20 @@ interface SideMenuProps {
   onClose: () => void;
   onAboutClick?: () => void;
   onSettingsClick?: () => void;
+  onFavoritesClick?: () => void;
+  onHomeClick?: () => void;
 }
 
-export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClick }: SideMenuProps) {
+export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClick, onFavoritesClick, onHomeClick }: SideMenuProps) {
   if (!isOpen) return null;
 
   const menuItems = [
-    { icon: '🏠', label: 'Home', action: () => console.log('Home') },
+    { icon: '🏠', label: 'Home', action: () => onHomeClick?.() },
     { icon: '🔥', label: 'Hot Deals', action: () => console.log('Hot Deals') },
     { icon: '💰', label: 'Dollar Express', action: () => console.log('Dollar Express') },
     { icon: '🎁', label: 'Free Items', action: () => console.log('Free Items') },
     { icon: '📱', label: 'My Listings', action: () => console.log('My Listings') },
-    { icon: '❤️', label: 'Favorites', action: () => console.log('Favorites') },
+    { icon: '❤️', label: 'Favorites', action: () => onFavoritesClick?.() },
     { icon: '⚙️', label: 'Settings', action: () => onSettingsClick?.() },
     { icon: 'ℹ️', label: 'About', action: () => onAboutClick?.() },
     { icon: '📞', label: 'Contact Us', action: () => console.log('Contact') },
