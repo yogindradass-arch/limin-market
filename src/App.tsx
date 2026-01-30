@@ -20,7 +20,7 @@ import { useAuth } from './context/AuthContext';
 import type { Product } from './types/product';
 
 export default function App() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeTab, setActiveTab] = useState('home');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
