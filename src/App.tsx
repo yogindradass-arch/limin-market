@@ -357,6 +357,26 @@ export default function App() {
             )}
           </section>
 
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-limin-dark flex items-center">
+                <span className="text-2xl mr-2">🆕</span>Recently Posted
+              </h2>
+            </div>
+            {allProducts.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {getFilteredProducts(allProducts).slice(0, 10).map(p => (
+                  <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl p-6 text-center">
+                <div className="text-4xl mb-3">📦</div>
+                <p className="text-sm text-gray-600">No listings yet. Be the first to post!</p>
+              </div>
+            )}
+          </section>
+
           <section className="pt-4">
             <h2 className="text-xl font-bold text-limin-dark mb-4">Shop by Category</h2>
             <div className="grid grid-cols-3 gap-3">
