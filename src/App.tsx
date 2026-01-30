@@ -59,6 +59,7 @@ export default function App() {
       }
 
       console.log('✅ Fetched products from database:', data?.length || 0, 'products');
+      console.log('📦 Raw products data:', data);
       if (data) {
         // Transform database format to Product type
         const transformedProducts: Product[] = data.map(item => {
@@ -163,13 +164,19 @@ export default function App() {
 
       if (data) {
         console.log('✅ Listing posted successfully:', data);
+        console.log('📝 New listing details:', {
+          title: data[0]?.title,
+          price: data[0]?.price,
+          category: data[0]?.category,
+          id: data[0]?.id
+        });
         alert('Listing posted successfully!');
         setShowPostForm(false);
         // Reset filter to "All" so user can see their new listing
         setActiveFilter('All');
         // Refresh products list
         console.log('🔄 Refreshing products list...');
-        fetchProducts();
+        await fetchProducts();
       }
     } catch (error) {
       console.error('Error posting listing:', error);
@@ -199,9 +206,12 @@ export default function App() {
         return;
       }
 
+      console.log('✅ Product deleted:', productId);
       alert('Listing deleted successfully!');
+      // Close modal first
+      closeModal();
       // Refresh products list
-      fetchProducts();
+      await fetchProducts();
     } catch (error) {
       console.error('Error deleting listing:', error);
       alert('Failed to delete listing. Please try again.');
