@@ -16,6 +16,7 @@ import LocationSelector from './components/LocationSelector';
 import EmptyState from './components/EmptyState';
 import AboutModal from './components/AboutModal';
 import SettingsModal from './components/SettingsModal';
+import UpdatePasswordModal from './components/UpdatePasswordModal';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import type { Product } from './types/product';
@@ -35,6 +36,7 @@ export default function App() {
   const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('Georgetown');
 
   // Sort and Filter state
@@ -45,6 +47,19 @@ export default function App() {
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Check for password recovery on mount
+  useEffect(() => {
+    // Check if user clicked password reset link
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+
+    if (type === 'recovery') {
+      setShowResetPassword(true);
+      // Clear the hash from URL
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
 
   // Fetch products from Supabase on mount
   useEffect(() => {
@@ -1016,6 +1031,11 @@ export default function App() {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         onAuthClick={() => setShowAuth(true)}
+      />
+
+      <UpdatePasswordModal
+        isOpen={showResetPassword}
+        onClose={() => setShowResetPassword(false)}
       />
     </div>
   );
