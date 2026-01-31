@@ -129,8 +129,12 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    // In edit mode, existing image is okay; in create mode, require new image
-    if (imageFiles.length === 0 && !formData.image.trim()) newErrors.image = 'Please select at least one image';
+    // Images are optional for Jobs and Services (will use default images)
+    const categoriesWithOptionalImages = ['Jobs', 'Services'];
+    if (!categoriesWithOptionalImages.includes(formData.category)) {
+      // In edit mode, existing image is okay; in create mode, require new image
+      if (imageFiles.length === 0 && !formData.image.trim()) newErrors.image = 'Please select at least one image';
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -143,6 +147,17 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       alert(moderationResult.message || 'Your listing contains inappropriate content.');
       return;
     }
+
+    // Get default image for categories that don't need photos
+    const getDefaultImageForCategory = (category: string): string => {
+      const defaultImages: Record<string, string> = {
+        'Jobs': 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=500',
+        'Services': 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500',
+        'Real Estate': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500',
+        'Vehicles': 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500',
+      };
+      return defaultImages[category] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500';
+    };
 
     // Upload images if files were selected
     let imageUrl = formData.image;
@@ -174,11 +189,16 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       setUploadingImage(false);
     }
 
+    // Use default image if no image was uploaded for Jobs/Services
+    if (!imageUrl || imageUrl === '') {
+      imageUrl = getDefaultImageForCategory(formData.category);
+    }
+
     onSubmit({
       ...formData,
       price: isFree ? 0 : formData.price,
       image: imageUrl,
-      images: uploadedImages.length > 0 ? uploadedImages : (formData.images || [formData.image]),
+      images: uploadedImages.length > 0 ? uploadedImages : (formData.images || [imageUrl]),
     }, productId);
   };
 
@@ -901,7 +921,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Images * (Max 2)
+                Product Images {['Jobs', 'Services'].includes(formData.category) ? '(Optional, Max 2)' : '* (Max 2)'}
               </label>
 
               {/* Image Previews */}
