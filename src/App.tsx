@@ -737,35 +737,42 @@ export default function App() {
       return (
         <div className="px-4">
           <EmptyState
-            icon="🌟"
-            title="Be the First to Post!"
-            message="Limin Market is ready for its first listings. Start the marketplace by posting something you want to sell, trade, or give away."
-            actionLabel="Post Your First Item"
+            icon="🚀"
+            title="Launch Your Community Marketplace!"
+            message="Be the pioneer! Limin Market isn't just another marketplace—it's your community hub for buying, selling, AND finding what you need. Post items you're offering OR things you're seeking."
+            actionLabel="Post First Listing"
             onAction={() => setShowPostForm(true)}
           />
 
           <div className="mt-8 bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-limin-dark mb-4">What can you post?</h3>
+            <h3 className="text-lg font-bold text-limin-dark mb-4">What makes Limin Market different?</h3>
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-3">
-                <span className="text-xl">📱</span>
+                <span className="text-xl">🔍</span>
                 <div>
-                  <strong>Items for sale</strong>
-                  <p className="text-gray-600">Electronics, furniture, vehicles, clothing, and more</p>
+                  <strong>Wanted Listings</strong>
+                  <p className="text-gray-600">Post what you're seeking, not just what you're selling. Let others find you!</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-xl">🎁</span>
+                <span className="text-xl">🏠</span>
                 <div>
-                  <strong>Free items</strong>
-                  <p className="text-gray-600">Give away things you no longer need</p>
+                  <strong>Specialized Categories</strong>
+                  <p className="text-gray-600">Real Estate, Vehicles, Jobs, Services—built for your needs</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-xl">💰</span>
+                <span className="text-xl">💬</span>
                 <div>
-                  <strong>Great deals</strong>
-                  <p className="text-gray-600">Wholesale items and bargain prices</p>
+                  <strong>Instant WhatsApp Connect</strong>
+                  <p className="text-gray-600">Contact sellers directly with pre-filled messages</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">🌍</span>
+                <div>
+                  <strong>Local & Wholesale</strong>
+                  <p className="text-gray-600">Filter by nearby items or discover bulk deals</p>
                 </div>
               </div>
             </div>
