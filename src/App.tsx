@@ -97,6 +97,7 @@ export default function App() {
             sellerId: item.seller_id,
             sellerPhone: item.seller_phone,
             listingType: item.listing_type as 'wholesale' | 'local' | 'standard',
+            listingMode: (item.listing_mode as 'offering' | 'seeking') || 'offering',
             image: item.image_url,
             images: item.images || [item.image_url],
             isFavorited: false,
@@ -190,6 +191,7 @@ export default function App() {
             seller_name: user.email?.split('@')[0] || 'Seller',
             seller_phone: listingData.phone,
             listing_type: listingData.listingType || 'standard',
+            listing_mode: listingData.listingMode || 'offering',
             image_url: listingData.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500',
             images: listingData.images || [listingData.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500'],
             is_active: true,
@@ -288,6 +290,7 @@ export default function App() {
           location: listing.location,
           seller_phone: listing.phone,
           listing_type: listing.listingType,
+          listing_mode: listing.listingMode || 'offering',
           image_url: listing.image,
           images: listing.images || [listing.image],
           // Real Estate fields
@@ -470,6 +473,7 @@ export default function App() {
     }
 
     // Apply active filter
+    if (activeFilter === 'Wanted') filtered = filtered.filter(p => p.listingMode === 'seeking');
     if (activeFilter === 'Nearby') filtered = filtered.filter(p => p.location === currentLocation);
     if (activeFilter === 'Real Estate') filtered = filtered.filter(p => p.category === 'Real Estate');
     if (activeFilter === 'Vehicles') filtered = filtered.filter(p => p.category === 'Vehicles');

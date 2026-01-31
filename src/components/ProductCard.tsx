@@ -48,6 +48,11 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {product.listingMode === 'seeking' && (
+            <span className="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+              🔍 WANTED
+            </span>
+          )}
           {product.listingType && (
             <>
               {product.listingType === 'wholesale' && (
@@ -94,7 +99,15 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
       <div className="p-3">
         {/* Price */}
         <p className="text-lg font-bold text-limin-dark mb-1">
-          {product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)}`}
+          {product.listingMode === 'seeking' ? (
+            product.price === 0 ? (
+              <span className="text-purple-600">Budget: Negotiable</span>
+            ) : (
+              <span className="text-purple-600">Budget: ${product.price.toFixed(2)}</span>
+            )
+          ) : (
+            product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)}`
+          )}
         </p>
 
         {/* Title */}

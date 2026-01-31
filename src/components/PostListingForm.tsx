@@ -18,6 +18,7 @@ export interface ListingFormData {
   location: string;
   phone: string;
   listingType: 'wholesale' | 'local' | 'standard';
+  listingMode?: 'offering' | 'seeking';  // Whether offering or seeking
   image: string;
   images?: string[];  // Array of all uploaded image URLs
   // Real Estate fields
@@ -108,6 +109,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       location: '',
       phone: '',
       listingType: 'standard',
+      listingMode: 'offering',
       image: '',
     }
   );
@@ -363,10 +365,45 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Listing Mode Toggle */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-purple-200">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                What are you doing? *
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleChange('listingMode', 'offering')}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+                    formData.listingMode === 'offering'
+                      ? 'bg-limin-primary text-white shadow-lg'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:border-limin-primary'
+                  }`}
+                >
+                  <span className="block text-lg mb-1">💼</span>
+                  <span className="block">Offering</span>
+                  <span className="block text-xs opacity-75">I'm selling/offering</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleChange('listingMode', 'seeking')}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+                    formData.listingMode === 'seeking'
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
+                  }`}
+                >
+                  <span className="block text-lg mb-1">🔍</span>
+                  <span className="block">Seeking</span>
+                  <span className="block text-xs opacity-75">I'm looking for</span>
+                </button>
+              </div>
+            </div>
+
             {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
+                {formData.listingMode === 'seeking' ? 'What are you looking for? *' : 'Title *'}
               </label>
               <input
                 type="text"
@@ -374,7 +411,11 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-                placeholder="e.g., iPhone 14 Pro 256GB"
+                placeholder={
+                  formData.listingMode === 'seeking'
+                    ? 'e.g., Looking for 2BR apartment in Georgetown'
+                    : 'e.g., iPhone 14 Pro 256GB'
+                }
               />
               {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
             </div>
@@ -390,7 +431,11 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-                placeholder="Describe your item in detail..."
+                placeholder={
+                  formData.listingMode === 'seeking'
+                    ? 'Describe what you need in detail...'
+                    : 'Describe your item in detail...'
+                }
               />
               {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
             </div>
@@ -398,7 +443,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
             {/* Price */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price {categoriesWithOptionalPrice.includes(formData.category) ? '' : '*'}
+                {formData.listingMode === 'seeking' ? 'Budget/Willing to Pay' : 'Price'} {categoriesWithOptionalPrice.includes(formData.category) ? '' : '*'}
                 {categoriesWithOptionalPrice.includes(formData.category) && (
                   <span className="text-gray-500 text-xs ml-1">(Optional - use specialized pricing fields)</span>
                 )}
@@ -411,7 +456,9 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                     onChange={(e) => setIsFree(e.target.checked)}
                     className="mr-2 h-4 w-4 text-limin-primary focus:ring-limin-primary"
                   />
-                  <span className="text-sm">This item is FREE</span>
+                  <span className="text-sm">
+                    {formData.listingMode === 'seeking' ? 'Negotiable/Open to offers' : 'This item is FREE'}
+                  </span>
                 </label>
               </div>
               {!isFree && (

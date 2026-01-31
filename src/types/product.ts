@@ -11,6 +11,7 @@ export interface Product {
   location: string;
   timeAgo: string;
   listingType?: 'wholesale' | 'local' | 'standard';
+  listingMode?: 'offering' | 'seeking';  // Whether offering to sell or seeking to buy
   isFavorited?: boolean;
   category?: string;
   description?: string;
