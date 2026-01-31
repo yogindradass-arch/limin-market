@@ -358,6 +358,63 @@ export default function App() {
 
   const handleDeleteListing = async (productId: string) => {
     try {
+      // First, get the product to access its images
+      const productToDelete = products.find(p => p.id === productId);
+
+      if (!productToDelete) {
+        alert('Product not found.');
+        return;
+      }
+
+      // Helper function to extract filename from Supabase storage URL
+      const getFilePathFromUrl = (url: string): string | null => {
+        try {
+          // Supabase storage URLs are in format: https://{project}.supabase.co/storage/v1/object/public/product-images/{filename}
+          const parts = url.split('/product-images/');
+          if (parts.length === 2) {
+            return parts[1];
+          }
+          return null;
+        } catch {
+          return null;
+        }
+      };
+
+      // Collect all image file paths to delete
+      const imagePaths: string[] = [];
+
+      // Add all images from the images array
+      if (productToDelete.images && productToDelete.images.length > 0) {
+        productToDelete.images.forEach(imageUrl => {
+          const filePath = getFilePathFromUrl(imageUrl);
+          if (filePath) {
+            imagePaths.push(filePath);
+          }
+        });
+      } else if (productToDelete.image) {
+        // Fallback to single image if images array is empty
+        const filePath = getFilePathFromUrl(productToDelete.image);
+        if (filePath) {
+          imagePaths.push(filePath);
+        }
+      }
+
+      // Delete images from storage if any exist
+      if (imagePaths.length > 0) {
+        const { error: storageError } = await supabase.storage
+          .from('product-images')
+          .remove(imagePaths);
+
+        if (storageError) {
+          console.error('Error deleting images from storage:', storageError);
+          // Don't block the deletion if storage deletion fails
+          // Just log the error and continue
+        } else {
+          console.log('✅ Deleted', imagePaths.length, 'image(s) from storage');
+        }
+      }
+
+      // Delete the product record from database
       const { error } = await supabase
         .from('products')
         .delete()
