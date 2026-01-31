@@ -535,6 +535,110 @@ export default function App() {
       );
     }
 
+    if (activeTab === 'account') {
+      const myListings = allProducts.filter(p => p.sellerId === user?.id);
+      const activeListings = myListings.filter(p => p.status === 'active');
+
+      return (
+        <div className="px-4 py-6 pb-24">
+          {/* Profile Header */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-20 h-20 bg-limin-primary/10 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-limin-primary" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-limin-dark">{user?.email?.split('@')[0] || 'User'}</h2>
+                <p className="text-sm text-gray-600">{user?.email || 'Not signed in'}</p>
+                {user && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {activeListings.length} active listing{activeListings.length !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {!user ? (
+              <button
+                onClick={() => setShowAuth(true)}
+                className="w-full py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+              >
+                Sign In to Post Listings
+              </button>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setShowPostForm(true)}
+                  className="py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                >
+                  Post Listing
+                </button>
+                <button
+                  onClick={() => setShowSettings(true)}
+                  className="py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                >
+                  Settings
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* My Listings */}
+          {user && (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-limin-dark mb-4">My Listings</h3>
+              {activeListings.length === 0 ? (
+                <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+                  <div className="text-5xl mb-3">📦</div>
+                  <p className="text-gray-600 mb-4">You haven't posted any listings yet</p>
+                  <button
+                    onClick={() => setShowPostForm(true)}
+                    className="px-6 py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                  >
+                    Create First Listing
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {activeListings.map(p => (
+                    <ProductCard
+                      key={p.id}
+                      product={{...p, isFavorited: favorites.has(p.id)}}
+                      onProductClick={handleProductClick}
+                      onFavoriteToggle={toggleFav}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Quick Actions */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Quick Actions</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => setActiveTab('favorites')}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
+              >
+                <span className="text-xl">❤️</span>
+                <span className="text-sm font-medium text-gray-700">My Favorites</span>
+              </button>
+              <button
+                onClick={() => setShowAbout(true)}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
+              >
+                <span className="text-xl">ℹ️</span>
+                <span className="text-sm font-medium text-gray-700">About Limin Market</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (activeTab === 'messages') {
       return (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
