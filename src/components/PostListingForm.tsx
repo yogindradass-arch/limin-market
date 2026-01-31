@@ -64,6 +64,9 @@ const categories = [
   'Other',
 ];
 
+const categoriesWithOptionalImages = ['Jobs', 'Services'];
+const categoriesWithOptionalPrice = ['Jobs', 'Services'];
+
 const locations = [
   // Guyana 🇬🇾
   'Georgetown, Guyana',
@@ -125,12 +128,14 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
 
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!isFree && formData.price <= 0) newErrors.price = 'Price must be greater than 0';
+    // Price is optional for Jobs (use salary fields) and Services (use hourly rate)
+    if (!categoriesWithOptionalPrice.includes(formData.category)) {
+      if (!isFree && formData.price <= 0) newErrors.price = 'Price must be greater than 0';
+    }
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
     // Images are optional for Jobs and Services (will use default images)
-    const categoriesWithOptionalImages = ['Jobs', 'Services'];
     if (!categoriesWithOptionalImages.includes(formData.category)) {
       // In edit mode, existing image is okay; in create mode, require new image
       if (imageFiles.length === 0 && !formData.image.trim()) newErrors.image = 'Please select at least one image';
@@ -393,7 +398,10 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
             {/* Price */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price *
+                Price {categoriesWithOptionalPrice.includes(formData.category) ? '' : '*'}
+                {categoriesWithOptionalPrice.includes(formData.category) && (
+                  <span className="text-gray-500 text-xs ml-1">(Optional - use specialized pricing fields)</span>
+                )}
               </label>
               <div className="flex items-center gap-4 mb-2">
                 <label className="flex items-center">
