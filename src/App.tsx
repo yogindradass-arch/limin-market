@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import LocationBar from './components/LocationBar';
 import FilterBar from './components/FilterBar';
+import SortFilterBar from './components/SortFilterBar';
 import HotDealsSection from './components/HotDealsSection';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -35,6 +36,11 @@ export default function App() {
   const [showAbout, setShowAbout] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('Georgetown');
+
+  // Sort and Filter state
+  const [sortBy, setSortBy] = useState('newest');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [showFreeOnly, setShowFreeOnly] = useState(false);
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -92,6 +98,7 @@ export default function App() {
             sellerPhone: item.seller_phone,
             listingType: item.listing_type as 'wholesale' | 'local' | 'standard',
             image: item.image_url,
+            images: item.images || [item.image_url],
             isFavorited: false,
             rating: 0, // Can be calculated later based on reviews
             timeAgo,
@@ -158,6 +165,7 @@ export default function App() {
             seller_phone: listingData.phone,
             listing_type: listingData.listingType || 'standard',
             image_url: listingData.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500',
+            images: listingData.images || [listingData.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500'],
             is_active: true,
             seller_id: user.id,
             status: 'active',
@@ -228,7 +236,8 @@ export default function App() {
           location: listing.location,
           seller_phone: listing.phone,
           listing_type: listing.listingType,
-          image: listing.image,
+          image_url: listing.image,
+          images: listing.images || [listing.image],
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings
@@ -382,14 +391,48 @@ export default function App() {
       filtered = filtered.filter(p => p.category === selectedCategory);
     }
 
-    // Then apply active filter
-    if (activeFilter === 'All') return filtered;
-    if (activeFilter === 'Nearby') return filtered.filter(p => p.location === currentLocation);
-    if (activeFilter === 'Under $50') return filtered.filter(p => p.price > 0 && p.price < 50);
-    if (activeFilter === 'Wholesale') return filtered.filter(p => p.listingType === 'wholesale');
-    if (activeFilter === 'New') return filtered.slice(0, 6); // Newest items
-    if (activeFilter === 'Top Rated') return filtered.filter(p => p.rating >= 4.5);
-    return filtered;
+    // Apply active filter
+    if (activeFilter === 'Nearby') filtered = filtered.filter(p => p.location === currentLocation);
+    if (activeFilter === 'Under $50') filtered = filtered.filter(p => p.price > 0 && p.price < 50);
+    if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
+    if (activeFilter === 'New') filtered = filtered.slice(0, 6);
+    if (activeFilter === 'Top Rated') filtered = filtered.filter(p => p.rating >= 4.5);
+
+    // Apply free only filter
+    if (showFreeOnly) {
+      filtered = filtered.filter(p => p.price === 0);
+    } else {
+      // Apply price range filter (only if not showing free items)
+      filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    }
+
+    // Apply sorting
+    const sorted = [...filtered];
+    if (sortBy === 'newest') {
+      sorted.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      });
+    } else if (sortBy === 'price-low') {
+      sorted.sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price-high') {
+      sorted.sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'expiring') {
+      sorted.sort((a, b) => {
+        const expiresA = new Date(a.expiresAt || '9999-12-31').getTime();
+        const expiresB = new Date(b.expiresAt || '9999-12-31').getTime();
+        return expiresA - expiresB;
+      });
+    }
+
+    return sorted;
+  };
+
+  const handleClearFilters = () => {
+    setPriceRange([0, 10000]);
+    setShowFreeOnly(false);
+    setSortBy('newest');
   };
 
   const filteredHotDeals = getFilteredProducts(hotDeals);
@@ -675,6 +718,19 @@ export default function App() {
       <Header onMenuClick={() => setShowMenu(true)} onSearchClick={() => setShowSearch(true)} />
       <LocationBar location={`${currentLocation}, Guyana`} onLocationClick={() => setShowLocationSelector(true)} />
       {activeTab === 'home' && <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />}
+      {activeTab === 'home' && (
+        <div className="px-4 pt-4">
+          <SortFilterBar
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+            showFreeOnly={showFreeOnly}
+            onFreeOnlyChange={setShowFreeOnly}
+            onClearFilters={handleClearFilters}
+          />
+        </div>
+      )}
 
       {renderContent()}
 
@@ -715,6 +771,7 @@ export default function App() {
             phone: editingProduct.sellerPhone,
             listingType: editingProduct.listingType || 'standard',
             image: editingProduct.image,
+            images: editingProduct.images || [editingProduct.image],
           } : undefined}
           productId={editingProduct?.id}
         />

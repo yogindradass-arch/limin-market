@@ -19,6 +19,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!isOpen || !product) return null;
 
@@ -96,13 +97,63 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
 
           {/* Content */}
           <div className="max-h-[90vh] overflow-y-auto">
-            {/* Image */}
+            {/* Image Carousel */}
             <div className="relative aspect-[4/3] bg-gray-200">
               <img
-                src={product.image}
-                alt={product.title}
+                src={(product.images && product.images.length > 0) ? product.images[currentImageIndex] : product.image}
+                alt={`${product.title} - Image ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover"
               />
+
+              {/* Navigation Arrows - only show if multiple images */}
+              {product.images && product.images.length > 1 && (
+                <>
+                  {/* Previous Image Button */}
+                  {currentImageIndex > 0 && (
+                    <button
+                      onClick={() => setCurrentImageIndex(prev => prev - 1)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 rounded-full shadow-lg hover:bg-white transition-colors"
+                      aria-label="Previous image"
+                    >
+                      <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Next Image Button */}
+                  {currentImageIndex < product.images.length - 1 && (
+                    <button
+                      onClick={() => setCurrentImageIndex(prev => prev + 1)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 rounded-full shadow-lg hover:bg-white transition-colors"
+                      aria-label="Next image"
+                    >
+                      <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Image Counter */}
+                  <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/60 text-white text-sm rounded-full">
+                    {currentImageIndex + 1} / {product.images.length}
+                  </div>
+
+                  {/* Image Dots Indicator */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {product.images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          index === currentImageIndex ? 'bg-white w-8' : 'bg-white/50'
+                        }`}
+                        aria-label={`Go to image ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
               {/* Favorite button */}
               <button

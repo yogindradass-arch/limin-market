@@ -3,6 +3,7 @@ export interface Product {
   title: string;
   price: number;
   image: string;
+  images?: string[];  // Array of all product images
   rating: number;
   seller: string;
   sellerId?: string;

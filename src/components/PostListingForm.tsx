@@ -19,6 +19,7 @@ export interface ListingFormData {
   phone: string;
   listingType: 'wholesale' | 'local' | 'standard';
   image: string;
+  images?: string[];  // Array of all uploaded image URLs
 }
 
 const categories = [
@@ -99,28 +100,29 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
 
     // Upload images if files were selected
     let imageUrl = formData.image;
+    let uploadedImages: string[] = [];
+
     if (imageFiles.length > 0) {
       setUploadingImage(true);
 
-      // Upload first image (primary image)
-      const { url, error } = await uploadProductImage(imageFiles[0]);
+      // Upload all selected images
+      for (const file of imageFiles) {
+        const { url, error } = await uploadProductImage(file);
 
-      if (error) {
-        setUploadingImage(false);
-        setErrors(prev => ({ ...prev, image: error }));
-        return;
+        if (error) {
+          setUploadingImage(false);
+          setErrors(prev => ({ ...prev, image: error }));
+          return;
+        }
+
+        if (url) {
+          uploadedImages.push(url);
+        }
       }
 
-      if (url) {
-        imageUrl = url;
-      }
-
-      // If there's a second image, upload it too
-      // For now we'll just use the first image in the listing
-      // You can extend the database schema later to support multiple images
-      if (imageFiles.length > 1) {
-        // Upload second image (currently not stored in database, but uploaded to storage)
-        await uploadProductImage(imageFiles[1]);
+      // Set the first image as the primary image for backwards compatibility
+      if (uploadedImages.length > 0) {
+        imageUrl = uploadedImages[0];
       }
 
       setUploadingImage(false);
@@ -130,6 +132,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       ...formData,
       price: isFree ? 0 : formData.price,
       image: imageUrl,
+      images: uploadedImages.length > 0 ? uploadedImages : (formData.images || [formData.image]),
     }, productId);
   };
 
