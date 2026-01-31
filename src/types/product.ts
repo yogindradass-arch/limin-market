@@ -31,4 +31,10 @@ export interface Product {
   vehicleCondition?: string;  // New, Used, Excellent, Good, Fair
   transmission?: string;  // Automatic, Manual
   fuelType?: string;  // Gasoline, Diesel, Electric, Hybrid
+  // Job fields
+  jobType?: string;  // Full-time, Part-time, Contract, Temporary
+  salaryMin?: number;
+  salaryMax?: number;
+  company?: string;
+  experienceLevel?: string;  // Entry Level, Mid Level, Senior Level
 }

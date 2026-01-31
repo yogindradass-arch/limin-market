@@ -102,6 +102,42 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
           {product.title}
         </h3>
 
+        {/* Specialized Details */}
+        {product.category === 'Real Estate' && (product.bedrooms || product.bathrooms || product.squareFeet) && (
+          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+            {product.bedrooms && <span>{product.bedrooms} bed</span>}
+            {product.bedrooms && product.bathrooms && <span>•</span>}
+            {product.bathrooms && <span>{product.bathrooms} bath</span>}
+            {(product.bedrooms || product.bathrooms) && product.squareFeet && <span>•</span>}
+            {product.squareFeet && <span>{product.squareFeet.toLocaleString()} sq ft</span>}
+          </div>
+        )}
+
+        {product.category === 'Vehicles' && (product.vehicleYear || product.vehicleMake || product.mileage) && (
+          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+            {product.vehicleYear && <span>{product.vehicleYear}</span>}
+            {product.vehicleYear && product.vehicleMake && <span></span>}
+            {product.vehicleMake && <span>{product.vehicleMake}</span>}
+            {product.vehicleModel && <span>{product.vehicleModel}</span>}
+            {(product.vehicleYear || product.vehicleMake) && product.mileage && <span>•</span>}
+            {product.mileage && <span>{product.mileage.toLocaleString()} mi</span>}
+          </div>
+        )}
+
+        {product.category === 'Jobs' && (product.jobType || product.experienceLevel || product.salaryMin) && (
+          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+            {product.jobType && <span>{product.jobType}</span>}
+            {product.jobType && product.experienceLevel && <span>•</span>}
+            {product.experienceLevel && <span>{product.experienceLevel}</span>}
+            {(product.jobType || product.experienceLevel) && (product.salaryMin || product.salaryMax) && <span>•</span>}
+            {(product.salaryMin || product.salaryMax) && (
+              <span>
+                ${product.salaryMin?.toLocaleString() || '0'}-{product.salaryMax?.toLocaleString() || '0'}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Location and Time */}
         <div className="flex items-center text-xs text-gray-500 mb-2">
           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

@@ -34,6 +34,12 @@ export interface ListingFormData {
   vehicleCondition?: string;
   transmission?: string;
   fuelType?: string;
+  // Job fields
+  jobType?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  company?: string;
+  experienceLevel?: string;
 }
 
 const categories = [
@@ -43,6 +49,7 @@ const categories = [
   'Sports',
   'Vehicles',
   'Real Estate',
+  'Jobs',
   'Books',
   'Furniture',
   'Tools',
@@ -188,6 +195,12 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
         vehicleCondition: undefined,
         transmission: undefined,
         fuelType: undefined,
+        // Clear Job fields
+        jobType: undefined,
+        salaryMin: undefined,
+        salaryMax: undefined,
+        company: undefined,
+        experienceLevel: undefined,
       }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
@@ -605,6 +618,92 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                       <option value="Electric">Electric</option>
                       <option value="Hybrid">Hybrid</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Job Specific Fields */}
+            {formData.category === 'Jobs' && (
+              <div className="space-y-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <h3 className="font-semibold text-gray-800">Job Details</h3>
+
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    value={formData.company || ''}
+                    onChange={(e) => handleChange('company', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    placeholder="e.g., ABC Company"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="jobType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Type
+                  </label>
+                  <select
+                    id="jobType"
+                    value={formData.jobType || ''}
+                    onChange={(e) => handleChange('jobType', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select type</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Temporary">Temporary</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="experienceLevel" className="block text-sm font-medium text-gray-700 mb-2">
+                    Experience Level
+                  </label>
+                  <select
+                    id="experienceLevel"
+                    value={formData.experienceLevel || ''}
+                    onChange={(e) => handleChange('experienceLevel', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select level</option>
+                    <option value="Entry Level">Entry Level</option>
+                    <option value="Mid Level">Mid Level</option>
+                    <option value="Senior Level">Senior Level</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Salary Range (Annual)
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <input
+                        type="number"
+                        id="salaryMin"
+                        value={formData.salaryMin || ''}
+                        onChange={(e) => handleChange('salaryMin', parseInt(e.target.value) || 0)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                        placeholder="Min $"
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        id="salaryMax"
+                        value={formData.salaryMax || ''}
+                        onChange={(e) => handleChange('salaryMax', parseInt(e.target.value) || 0)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                        placeholder="Max $"
+                        min="0"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
