@@ -6,7 +6,22 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
-type AuthMode = 'signin' | 'signup';
+type AuthMode = 'signin' | 'signup' | 'forgot-password';
+
+// Password strength checker
+function getPasswordStrength(password: string): { strength: number; label: string; color: string } {
+  let strength = 0;
+  if (password.length >= 8) strength++;
+  if (password.length >= 12) strength++;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+  if (/[0-9]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+  if (strength === 0 || strength === 1) return { strength: 1, label: 'Weak', color: 'bg-red-500' };
+  if (strength === 2 || strength === 3) return { strength: 2, label: 'Fair', color: 'bg-yellow-500' };
+  if (strength === 4) return { strength: 3, label: 'Good', color: 'bg-blue-500' };
+  return { strength: 4, label: 'Strong', color: 'bg-green-500' };
+}
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [mode, setMode] = useState<AuthMode>('signin');
@@ -14,26 +29,37 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
-      const { error: authError } = mode === 'signin'
-        ? await signIn(email, password)
-        : await signUp(email, password);
-
-      if (authError) {
-        setError(authError.message);
+      if (mode === 'forgot-password') {
+        const { error: authError } = await resetPassword(email);
+        if (authError) {
+          setError(authError.message);
+        } else {
+          setSuccess('Password reset link sent! Check your email.');
+        }
       } else {
-        // Success! Close the modal
-        onClose();
+        const { error: authError } = mode === 'signin'
+          ? await signIn(email, password)
+          : await signUp(email, password);
+
+        if (authError) {
+          setError(authError.message);
+        } else {
+          // Success! Close the modal
+          onClose();
+        }
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -45,7 +71,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const switchMode = () => {
     setMode(mode === 'signin' ? 'signup' : 'signin');
     setError('');
+    setSuccess('');
+    setPassword('');
   };
+
+  const passwordStrength = mode === 'signup' && password ? getPasswordStrength(password) : null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
@@ -66,22 +96,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <div className="p-8">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-limin-dark mb-2">
-                {mode === 'signin' ? 'Welcome Back' : 'Join Limin Market'}
+                {mode === 'signin' && 'Welcome Back'}
+                {mode === 'signup' && 'Join Limin Market'}
+                {mode === 'forgot-password' && 'Reset Password'}
               </h2>
               <p className="text-gray-600">
-                {mode === 'signin'
-                  ? 'Sign in to manage your listings'
-                  : 'Create an account to start selling'}
+                {mode === 'signin' && 'Sign in to manage your listings'}
+                {mode === 'signup' && 'Create an account to start selling'}
+                {mode === 'forgot-password' && "Enter your email and we'll send you a reset link"}
               </p>
             </div>
 
             {error && (
-              <div className={`mb-4 p-3 rounded-lg text-sm ${
-                error.includes('Check your email')
-                  ? 'bg-green-50 text-green-800'
-                  : 'bg-red-50 text-red-800'
-              }`}>
+              <div className="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-800">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-4 p-3 rounded-lg text-sm bg-green-50 text-green-800">
+                {success}
               </div>
             )}
 
@@ -101,43 +135,116 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 />
               </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-                  placeholder="••••••••"
-                />
-                {mode === 'signup' && (
-                  <p className="text-xs text-gray-500 mt-1">At least 6 characters</p>
-                )}
-              </div>
+              {mode !== 'forgot-password' && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                      Password
+                    </label>
+                    {mode === 'signin' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMode('forgot-password');
+                          setError('');
+                          setPassword('');
+                        }}
+                        className="text-xs text-limin-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    placeholder="••••••••"
+                  />
+                  {mode === 'signup' && (
+                    <>
+                      {/* Password Strength Indicator */}
+                      {password && passwordStrength && (
+                        <div className="mt-2">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-gray-600">Password strength:</span>
+                            <span className={`font-medium ${
+                              passwordStrength.label === 'Weak' ? 'text-red-600' :
+                              passwordStrength.label === 'Fair' ? 'text-yellow-600' :
+                              passwordStrength.label === 'Good' ? 'text-blue-600' :
+                              'text-green-600'
+                            }`}>
+                              {passwordStrength.label}
+                            </span>
+                          </div>
+                          <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${passwordStrength.color} transition-all duration-300`}
+                              style={{ width: `${(passwordStrength.strength / 4) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {/* Password Requirements */}
+                      <div className="mt-2 space-y-1">
+                        <p className="text-xs font-medium text-gray-700">Password must have:</p>
+                        <ul className="text-xs text-gray-600 space-y-0.5 ml-1">
+                          <li className={password.length >= 8 ? 'text-green-600' : ''}>• At least 8 characters</li>
+                          <li className={/[A-Z]/.test(password) && /[a-z]/.test(password) ? 'text-green-600' : ''}>
+                            • Upper and lowercase letters
+                          </li>
+                          <li className={/[0-9]/.test(password) ? 'text-green-600' : ''}>• At least one number</li>
+                          <li className={/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : ''}>
+                            • Special character (recommended)
+                          </li>
+                        </ul>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
 
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-limin-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Create Account'}
+                {loading ? 'Please wait...' :
+                  mode === 'signin' ? 'Sign In' :
+                  mode === 'signup' ? 'Create Account' :
+                  'Send Reset Link'}
               </button>
             </form>
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={switchMode}
-                className="text-sm text-limin-primary hover:underline"
-              >
-                {mode === 'signin'
-                  ? "Don't have an account? Sign up"
-                  : 'Already have an account? Sign in'}
-              </button>
+            <div className="mt-6 text-center space-y-2">
+              {mode !== 'forgot-password' && (
+                <button
+                  onClick={switchMode}
+                  className="text-sm text-limin-primary hover:underline"
+                >
+                  {mode === 'signin'
+                    ? "Don't have an account? Sign up"
+                    : 'Already have an account? Sign in'}
+                </button>
+              )}
+
+              {mode === 'forgot-password' && (
+                <button
+                  onClick={() => {
+                    setMode('signin');
+                    setError('');
+                    setSuccess('');
+                    setPassword('');
+                  }}
+                  className="text-sm text-limin-primary hover:underline"
+                >
+                  Back to sign in
+                </button>
+              )}
             </div>
           </div>
         </div>
