@@ -37,4 +37,10 @@ export interface Product {
   salaryMax?: number;
   company?: string;
   experienceLevel?: string;  // Entry Level, Mid Level, Senior Level
+  // Service fields
+  serviceType?: string;  // Delivery, Cleaning, Repairs, Construction, etc.
+  serviceArea?: string;  // Areas served
+  priceType?: string;  // Hourly, Per Job, Per Item, Per Mile
+  hourlyRate?: number;
+  responseTime?: string;  // Same Day, 24 Hours, 48 Hours
 }

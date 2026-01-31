@@ -125,6 +125,12 @@ export default function App() {
             salaryMax: item.salary_max,
             company: item.company,
             experienceLevel: item.experience_level,
+            // Service fields
+            serviceType: item.service_type,
+            serviceArea: item.service_area,
+            priceType: item.price_type,
+            hourlyRate: item.hourly_rate,
+            responseTime: item.response_time,
           };
         });
 
@@ -210,6 +216,12 @@ export default function App() {
             salary_max: listingData.salaryMax,
             company: listingData.company,
             experience_level: listingData.experienceLevel,
+            // Service fields
+            service_type: listingData.serviceType,
+            service_area: listingData.serviceArea,
+            price_type: listingData.priceType,
+            hourly_rate: listingData.hourlyRate,
+            response_time: listingData.responseTime,
           },
         ])
         .select();
@@ -298,6 +310,12 @@ export default function App() {
           salary_max: listing.salaryMax,
           company: listing.company,
           experience_level: listing.experienceLevel,
+          // Service fields
+          service_type: listing.serviceType,
+          service_area: listing.serviceArea,
+          price_type: listing.priceType,
+          hourly_rate: listing.hourlyRate,
+          response_time: listing.responseTime,
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings
@@ -456,6 +474,7 @@ export default function App() {
     if (activeFilter === 'Real Estate') filtered = filtered.filter(p => p.category === 'Real Estate');
     if (activeFilter === 'Vehicles') filtered = filtered.filter(p => p.category === 'Vehicles');
     if (activeFilter === 'Jobs') filtered = filtered.filter(p => p.category === 'Jobs');
+    if (activeFilter === 'Services') filtered = filtered.filter(p => p.category === 'Services');
     if (activeFilter === 'Under $50') filtered = filtered.filter(p => p.price > 0 && p.price < 50);
     if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
 

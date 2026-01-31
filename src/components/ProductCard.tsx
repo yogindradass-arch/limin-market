@@ -138,6 +138,18 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
           </div>
         )}
 
+        {product.category === 'Services' && (product.serviceType || product.priceType || product.responseTime) && (
+          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+            {product.serviceType && <span>{product.serviceType}</span>}
+            {product.serviceType && product.priceType && <span>•</span>}
+            {product.priceType && product.hourlyRate && (
+              <span>${product.hourlyRate}/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
+            )}
+            {(product.serviceType || product.priceType) && product.responseTime && <span>•</span>}
+            {product.responseTime && <span>{product.responseTime}</span>}
+          </div>
+        )}
+
         {/* Location and Time */}
         <div className="flex items-center text-xs text-gray-500 mb-2">
           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

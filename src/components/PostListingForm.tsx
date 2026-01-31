@@ -40,6 +40,12 @@ export interface ListingFormData {
   salaryMax?: number;
   company?: string;
   experienceLevel?: string;
+  // Service fields
+  serviceType?: string;
+  serviceArea?: string;
+  priceType?: string;
+  hourlyRate?: number;
+  responseTime?: string;
 }
 
 const categories = [
@@ -50,6 +56,7 @@ const categories = [
   'Vehicles',
   'Real Estate',
   'Jobs',
+  'Services',
   'Books',
   'Furniture',
   'Tools',
@@ -201,6 +208,12 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
         salaryMax: undefined,
         company: undefined,
         experienceLevel: undefined,
+        // Clear Service fields
+        serviceType: undefined,
+        serviceArea: undefined,
+        priceType: undefined,
+        hourlyRate: undefined,
+        responseTime: undefined,
       }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
@@ -705,6 +718,105 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Service Specific Fields */}
+            {formData.category === 'Services' && (
+              <div className="space-y-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <h3 className="font-semibold text-gray-800">Service Details</h3>
+
+                <div>
+                  <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Service Type
+                  </label>
+                  <select
+                    id="serviceType"
+                    value={formData.serviceType || ''}
+                    onChange={(e) => handleChange('serviceType', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select type</option>
+                    <option value="Delivery">Delivery</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Repairs & Maintenance">Repairs & Maintenance</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Catering">Catering</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Event Planning">Event Planning</option>
+                    <option value="Beauty & Wellness">Beauty & Wellness</option>
+                    <option value="Tutoring">Tutoring</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="serviceArea" className="block text-sm font-medium text-gray-700 mb-2">
+                    Service Area
+                  </label>
+                  <input
+                    type="text"
+                    id="serviceArea"
+                    value={formData.serviceArea || ''}
+                    onChange={(e) => handleChange('serviceArea', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    placeholder="e.g., Georgetown, Kitty, Bel Air"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="priceType" className="block text-sm font-medium text-gray-700 mb-2">
+                      Pricing Type
+                    </label>
+                    <select
+                      id="priceType"
+                      value={formData.priceType || ''}
+                      onChange={(e) => handleChange('priceType', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    >
+                      <option value="">Select type</option>
+                      <option value="Hourly">Hourly</option>
+                      <option value="Per Job">Per Job</option>
+                      <option value="Per Item">Per Item</option>
+                      <option value="Per Mile">Per Mile</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700 mb-2">
+                      Rate/Price ($)
+                    </label>
+                    <input
+                      type="number"
+                      id="hourlyRate"
+                      value={formData.hourlyRate || ''}
+                      onChange={(e) => handleChange('hourlyRate', parseInt(e.target.value) || 0)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="e.g., 50"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="responseTime" className="block text-sm font-medium text-gray-700 mb-2">
+                    Response Time
+                  </label>
+                  <select
+                    id="responseTime"
+                    value={formData.responseTime || ''}
+                    onChange={(e) => handleChange('responseTime', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select time</option>
+                    <option value="Immediate">Immediate</option>
+                    <option value="Same Day">Same Day</option>
+                    <option value="24 Hours">24 Hours</option>
+                    <option value="48 Hours">48 Hours</option>
+                    <option value="By Appointment">By Appointment</option>
+                  </select>
                 </div>
               </div>
             )}
