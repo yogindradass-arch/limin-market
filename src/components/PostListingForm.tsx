@@ -137,8 +137,9 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.location) newErrors.location = 'Location is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    // Images are optional for Jobs and Services (will use default images)
-    if (!categoriesWithOptionalImages.includes(formData.category)) {
+    // Images are optional for Jobs, Services, and all "Seeking" (Wanted) listings
+    const skipImageValidation = categoriesWithOptionalImages.includes(formData.category) || formData.listingMode === 'seeking';
+    if (!skipImageValidation) {
       // In edit mode, existing image is okay; in create mode, require new image
       if (imageFiles.length === 0 && !formData.image.trim()) newErrors.image = 'Please select at least one image';
     }
@@ -976,7 +977,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Images {['Jobs', 'Services'].includes(formData.category) ? '(Optional, Max 2)' : '* (Max 2)'}
+                Product Images {(['Jobs', 'Services'].includes(formData.category) || formData.listingMode === 'seeking') ? '(Optional, Max 2)' : '* (Max 2)'}
               </label>
 
               {/* Image Previews */}
