@@ -105,6 +105,20 @@ export default function App() {
             status: item.status || 'active',
             expiresAt: item.expires_at,
             createdAt: item.created_at,
+            // Real Estate fields
+            bedrooms: item.bedrooms,
+            bathrooms: item.bathrooms,
+            squareFeet: item.square_feet,
+            propertyType: item.property_type,
+            listingPurpose: item.listing_purpose,
+            // Vehicle fields
+            vehicleMake: item.vehicle_make,
+            vehicleModel: item.vehicle_model,
+            vehicleYear: item.vehicle_year,
+            mileage: item.mileage,
+            vehicleCondition: item.vehicle_condition,
+            transmission: item.transmission,
+            fuelType: item.fuel_type,
           };
         });
 
@@ -170,6 +184,20 @@ export default function App() {
             seller_id: user.id,
             status: 'active',
             expires_at: expiresAt.toISOString(),
+            // Real Estate fields
+            bedrooms: listingData.bedrooms,
+            bathrooms: listingData.bathrooms,
+            square_feet: listingData.squareFeet,
+            property_type: listingData.propertyType,
+            listing_purpose: listingData.listingPurpose,
+            // Vehicle fields
+            vehicle_make: listingData.vehicleMake,
+            vehicle_model: listingData.vehicleModel,
+            vehicle_year: listingData.vehicleYear,
+            mileage: listingData.mileage,
+            vehicle_condition: listingData.vehicleCondition,
+            transmission: listingData.transmission,
+            fuel_type: listingData.fuelType,
           },
         ])
         .select();
@@ -238,6 +266,20 @@ export default function App() {
           listing_type: listing.listingType,
           image_url: listing.image,
           images: listing.images || [listing.image],
+          // Real Estate fields
+          bedrooms: listing.bedrooms,
+          bathrooms: listing.bathrooms,
+          square_feet: listing.squareFeet,
+          property_type: listing.propertyType,
+          listing_purpose: listing.listingPurpose,
+          // Vehicle fields
+          vehicle_make: listing.vehicleMake,
+          vehicle_model: listing.vehicleModel,
+          vehicle_year: listing.vehicleYear,
+          mileage: listing.mileage,
+          vehicle_condition: listing.vehicleCondition,
+          transmission: listing.transmission,
+          fuel_type: listing.fuelType,
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings

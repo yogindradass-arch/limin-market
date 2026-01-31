@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Product } from '../types/product';
 import { useAuth } from '../context/AuthContext';
+import ShareButton from './ShareButton';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -262,6 +263,11 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
 
               {/* Action Buttons */}
               <div className="space-y-3">
+                {/* Share Button - visible to everyone */}
+                <div className="flex justify-center pb-2">
+                  <ShareButton product={product} />
+                </div>
+
                 {/* Contact Button - only show if not owner */}
                 {!isOwner && (
                   <>

@@ -17,4 +17,18 @@ export interface Product {
   status?: 'active' | 'sold' | 'expired';
   expiresAt?: string;
   createdAt?: string;
+  // Real Estate fields
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFeet?: number;
+  propertyType?: string;  // House, Apartment, Land, Commercial
+  listingPurpose?: string;  // For Sale, For Rent
+  // Vehicle fields
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleYear?: number;
+  mileage?: number;
+  vehicleCondition?: string;  // New, Used, Excellent, Good, Fair
+  transmission?: string;  // Automatic, Manual
+  fuelType?: string;  // Gasoline, Diesel, Electric, Hybrid
 }

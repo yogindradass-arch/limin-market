@@ -20,6 +20,20 @@ export interface ListingFormData {
   listingType: 'wholesale' | 'local' | 'standard';
   image: string;
   images?: string[];  // Array of all uploaded image URLs
+  // Real Estate fields
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFeet?: number;
+  propertyType?: string;
+  listingPurpose?: string;
+  // Vehicle fields
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleYear?: number;
+  mileage?: number;
+  vehicleCondition?: string;
+  transmission?: string;
+  fuelType?: string;
 }
 
 const categories = [
@@ -28,6 +42,7 @@ const categories = [
   'Household',
   'Sports',
   'Vehicles',
+  'Real Estate',
   'Books',
   'Furniture',
   'Tools',
@@ -36,14 +51,31 @@ const categories = [
 ];
 
 const locations = [
-  'Georgetown',
-  'New Amsterdam',
-  'Linden',
-  'Anna Regina',
-  'Bartica',
-  'Skeldon',
-  'Rose Hall',
-  'Mahaica',
+  // Guyana 🇬🇾
+  'Georgetown, Guyana',
+  'New Amsterdam, Guyana',
+  'Linden, Guyana',
+  'Anna Regina, Guyana',
+  'Bartica, Guyana',
+  'Skeldon, Guyana',
+  'Rose Hall, Guyana',
+  'Mahaica, Guyana',
+  // New York 🇺🇸
+  'Queens, NY',
+  'Brooklyn, NY',
+  'Bronx, NY',
+  'Richmond Hill, NY',
+  'Ozone Park, NY',
+  'South Ozone Park, NY',
+  'Jamaica, NY',
+  'Schenectady, NY',
+  'Albany, NY',
+  // Florida
+  'Miami, FL',
+  'Fort Lauderdale, FL',
+  'Orlando, FL',
+  // Other US Cities
+  'Toronto, Canada',
   'Other',
 ];
 
@@ -137,7 +169,30 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
   };
 
   const handleChange = (field: keyof ListingFormData, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // If category is changing, clear specialized fields
+    if (field === 'category') {
+      setFormData(prev => ({
+        ...prev,
+        category: value as string,
+        // Clear Real Estate fields
+        bedrooms: undefined,
+        bathrooms: undefined,
+        squareFeet: undefined,
+        propertyType: undefined,
+        listingPurpose: undefined,
+        // Clear Vehicle fields
+        vehicleMake: undefined,
+        vehicleModel: undefined,
+        vehicleYear: undefined,
+        mileage: undefined,
+        vehicleCondition: undefined,
+        transmission: undefined,
+        fuelType: undefined,
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -340,6 +395,220 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
               </select>
               {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
             </div>
+
+            {/* Real Estate Specific Fields */}
+            {formData.category === 'Real Estate' && (
+              <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="font-semibold text-gray-800">Real Estate Details</h3>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700 mb-2">
+                      Bedrooms
+                    </label>
+                    <input
+                      type="number"
+                      id="bedrooms"
+                      value={formData.bedrooms || ''}
+                      onChange={(e) => handleChange('bedrooms', parseInt(e.target.value) || 0)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bathrooms" className="block text-sm font-medium text-gray-700 mb-2">
+                      Bathrooms
+                    </label>
+                    <input
+                      type="number"
+                      id="bathrooms"
+                      value={formData.bathrooms || ''}
+                      onChange={(e) => handleChange('bathrooms', parseFloat(e.target.value) || 0)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="0"
+                      min="0"
+                      step="0.5"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="squareFeet" className="block text-sm font-medium text-gray-700 mb-2">
+                    Square Feet
+                  </label>
+                  <input
+                    type="number"
+                    id="squareFeet"
+                    value={formData.squareFeet || ''}
+                    onChange={(e) => handleChange('squareFeet', parseInt(e.target.value) || 0)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="propertyType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Property Type
+                  </label>
+                  <select
+                    id="propertyType"
+                    value={formData.propertyType || ''}
+                    onChange={(e) => handleChange('propertyType', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select type</option>
+                    <option value="House">House</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="Land">Land</option>
+                    <option value="Commercial">Commercial</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="listingPurpose" className="block text-sm font-medium text-gray-700 mb-2">
+                    Listing Purpose
+                  </label>
+                  <select
+                    id="listingPurpose"
+                    value={formData.listingPurpose || ''}
+                    onChange={(e) => handleChange('listingPurpose', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select purpose</option>
+                    <option value="For Sale">For Sale</option>
+                    <option value="For Rent">For Rent</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Vehicle Specific Fields */}
+            {formData.category === 'Vehicles' && (
+              <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                <h3 className="font-semibold text-gray-800">Vehicle Details</h3>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="vehicleMake" className="block text-sm font-medium text-gray-700 mb-2">
+                      Make
+                    </label>
+                    <input
+                      type="text"
+                      id="vehicleMake"
+                      value={formData.vehicleMake || ''}
+                      onChange={(e) => handleChange('vehicleMake', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="e.g., Toyota"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="vehicleModel" className="block text-sm font-medium text-gray-700 mb-2">
+                      Model
+                    </label>
+                    <input
+                      type="text"
+                      id="vehicleModel"
+                      value={formData.vehicleModel || ''}
+                      onChange={(e) => handleChange('vehicleModel', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="e.g., Camry"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="vehicleYear" className="block text-sm font-medium text-gray-700 mb-2">
+                      Year
+                    </label>
+                    <input
+                      type="number"
+                      id="vehicleYear"
+                      value={formData.vehicleYear || ''}
+                      onChange={(e) => handleChange('vehicleYear', parseInt(e.target.value) || 0)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="2020"
+                      min="1900"
+                      max={new Date().getFullYear() + 1}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="mileage" className="block text-sm font-medium text-gray-700 mb-2">
+                      Mileage (miles)
+                    </label>
+                    <input
+                      type="number"
+                      id="mileage"
+                      value={formData.mileage || ''}
+                      onChange={(e) => handleChange('mileage', parseInt(e.target.value) || 0)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                      placeholder="50000"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="vehicleCondition" className="block text-sm font-medium text-gray-700 mb-2">
+                    Condition
+                  </label>
+                  <select
+                    id="vehicleCondition"
+                    value={formData.vehicleCondition || ''}
+                    onChange={(e) => handleChange('vehicleCondition', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                  >
+                    <option value="">Select condition</option>
+                    <option value="New">New</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                    <option value="Used">Used</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="transmission" className="block text-sm font-medium text-gray-700 mb-2">
+                      Transmission
+                    </label>
+                    <select
+                      id="transmission"
+                      value={formData.transmission || ''}
+                      onChange={(e) => handleChange('transmission', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    >
+                      <option value="">Select transmission</option>
+                      <option value="Automatic">Automatic</option>
+                      <option value="Manual">Manual</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="fuelType" className="block text-sm font-medium text-gray-700 mb-2">
+                      Fuel Type
+                    </label>
+                    <select
+                      id="fuelType"
+                      value={formData.fuelType || ''}
+                      onChange={(e) => handleChange('fuelType', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                    >
+                      <option value="">Select fuel type</option>
+                      <option value="Gasoline">Gasoline</option>
+                      <option value="Diesel">Diesel</option>
+                      <option value="Electric">Electric</option>
+                      <option value="Hybrid">Hybrid</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Location */}
             <div>
