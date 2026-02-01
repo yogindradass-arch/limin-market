@@ -27,8 +27,8 @@ export default function BottomNav({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-      <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-inset-bottom">
+      <div className="flex items-center justify-around h-14 px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -43,20 +43,20 @@ export default function BottomNav({
                   onTabChange(tab.id);
                 }
               }}
-              className="flex flex-col items-center justify-center flex-1 h-full relative"
+              className="flex flex-col items-center justify-center flex-1 h-full relative transition-all duration-200 hover:bg-gray-50 rounded-lg py-1"
             >
-              <div className="relative">
+              <div className="relative mb-0.5">
                 <Icon isActive={isActive} />
                 {/* Badge for messages and admin tabs */}
                 {'badge' in tab && tab.badge && tab.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center shadow-sm">
                     {tab.badge > 9 ? '9+' : tab.badge}
                   </span>
                 )}
               </div>
               <span
-                className={`text-xs mt-1 ${
-                  isActive ? 'text-limin-primary font-medium' : 'text-gray-600'
+                className={`text-[10px] leading-tight ${
+                  isActive ? 'text-limin-primary font-semibold' : 'text-gray-500'
                 }`}
               >
                 {tab.label}
@@ -168,7 +168,7 @@ function AccountIcon({ isActive }: { isActive: boolean }) {
 function AdminIcon({ isActive }: { isActive: boolean }) {
   return (
     <svg
-      className={`w-6 h-6 ${isActive ? 'text-red-600' : 'text-gray-600'}`}
+      className={`w-6 h-6 ${isActive ? 'text-limin-primary' : 'text-gray-600'}`}
       fill={isActive ? 'currentColor' : 'none'}
       stroke="currentColor"
       viewBox="0 0 24 24"
