@@ -1,226 +1,252 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
-interface MessagePayload {
-  type: "INSERT";
-  table: "messages";
-  record: {
-    id: string;
-    conversation_id: string;
-    sender_id: string;
-    content: string;
-    created_at: string;
+interface EmailPayload {
+  to: string;
+  type: 'new_message' | 'price_drop' | 'new_listing';
+  data: {
+    productTitle?: string;
+    productId?: string;
+    senderName?: string;
+    oldPrice?: number;
+    newPrice?: number;
+    searchName?: string;
+    category?: string;
   };
 }
 
-interface EmailRequest {
-  messageId?: string;
-  conversationId?: string;
-  emailType?: "new_message" | "price_drop" | "new_listing";
-  recipientEmail?: string;
-  recipientId?: string;
-  data?: Record<string, any>;
-}
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
-serve(async (req) => {
-  try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+async function sendEmail(payload: EmailPayload) {
+  const { to, type, data } = payload;
 
-    // Parse request body
-    const body: EmailRequest = await req.json();
-    const { conversationId, emailType = "new_message", recipientId } = body;
+  let subject = '';
+  let htmlContent = '';
 
-    if (!conversationId || !recipientId) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Check notification preferences
-    const { data: prefs, error: prefsError } = await supabase
-      .from("notification_preferences")
-      .select("email_new_messages")
-      .eq("user_id", recipientId)
-      .single();
-
-    // If user has disabled email notifications, skip sending
-    if (prefs && !prefs.email_new_messages) {
-      console.log(`User ${recipientId} has disabled email notifications`);
-      return new Response(
-        JSON.stringify({ message: "Notifications disabled for user" }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Fetch conversation and related data
-    const { data: conversation, error: convError } = await supabase
-      .from("conversations")
-      .select(`
-        *,
-        product:products(title, price, image)
-      `)
-      .eq("id", conversationId)
-      .single();
-
-    if (convError || !conversation) {
-      throw new Error(`Failed to fetch conversation: ${convError?.message}`);
-    }
-
-    // Get recipient's email
-    const { data: { user: recipient }, error: recipientError } = await supabase.auth.admin.getUserById(recipientId);
-
-    if (recipientError || !recipient?.email) {
-      throw new Error(`Failed to fetch recipient email: ${recipientError?.message}`);
-    }
-
-    // Get sender's name
-    const senderId = conversation.buyer_id === recipientId ? conversation.seller_id : conversation.buyer_id;
-    const { data: senderProfile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", senderId)
-      .single();
-
-    const { data: { user: sender } } = await supabase.auth.admin.getUserById(senderId);
-    const senderName = senderProfile?.full_name || sender?.email?.split("@")[0] || "A user";
-
-    // Prepare email content
-    const product = conversation.product as any;
-    const productTitle = product?.title || "a product";
-    const productPrice = product?.price === 0 ? "FREE" : `$${product?.price.toFixed(2)}`;
-
-    const emailSubject = `New message from ${senderName} about ${productTitle}`;
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
+  // Generate email content based on type
+  switch (type) {
+    case 'new_message':
+      subject = `New message about ${data.productTitle}`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
         <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: white; padding: 30px; border: 1px solid #e5e5e5; }
-            .product-info { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; }
-            .product-title { font-weight: bold; color: #2D3748; margin-bottom: 5px; }
-            .product-price { color: #FF6B35; font-size: 18px; font-weight: bold; }
-            .button { display: inline-block; background: #FF6B35; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+            .header { background: linear-gradient(135deg, #0EA5E9 0%, #F97316 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .button { display: inline-block; background: #0EA5E9; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1 style="margin: 0;">💬 New Message on Limin Market</h1>
+              <h1>💬 New Message</h1>
             </div>
             <div class="content">
-              <p>Hi there!</p>
-              <p><strong>${senderName}</strong> sent you a message about:</p>
-
-              <div class="product-info">
-                <div class="product-title">${productTitle}</div>
-                <div class="product-price">${productPrice}</div>
-              </div>
-
-              <p>Log in to your account to read and respond to this message.</p>
-
-              <a href="${SUPABASE_URL.replace('.supabase.co', '')}" class="button">View Message</a>
-
-              <p style="color: #666; font-size: 14px; margin-top: 30px;">
-                You're receiving this email because you have message notifications enabled.
-                You can change your notification preferences in your account settings.
-              </p>
+              <p>Hi!</p>
+              <p><strong>${data.senderName || 'Someone'}</strong> sent you a message about your listing:</p>
+              <h3>${data.productTitle}</h3>
+              <p>Click the button below to view and respond to the message:</p>
+              <a href="${SUPABASE_URL.replace(/\/$/, '')}" class="button">View Message</a>
             </div>
             <div class="footer">
-              <p>© 2026 Limin Market. All rights reserved.</p>
+              <p>You're receiving this email because you have message notifications enabled.</p>
+              <p>Manage your notification preferences in Settings.</p>
             </div>
           </div>
         </body>
-      </html>
-    `;
+        </html>
+      `;
+      break;
 
-    // Send email via Resend
-    if (!RESEND_API_KEY) {
-      console.warn("RESEND_API_KEY not configured, skipping email send");
+    case 'price_drop':
+      const savings = data.oldPrice && data.newPrice ? data.oldPrice - data.newPrice : 0;
+      const savingsPercent = data.oldPrice ? Math.round((savings / data.oldPrice) * 100) : 0;
+      subject = `💰 Price Drop Alert: ${data.productTitle}`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .price-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+            .old-price { text-decoration: line-through; color: #999; font-size: 18px; }
+            .new-price { color: #10B981; font-size: 32px; font-weight: bold; }
+            .savings { color: #059669; font-size: 16px; font-weight: bold; margin-top: 10px; }
+            .button { display: inline-block; background: #10B981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>💰 Price Drop Alert!</h1>
+            </div>
+            <div class="content">
+              <p>Good news! A product you favorited just dropped in price:</p>
+              <h3>${data.productTitle}</h3>
+              <div class="price-box">
+                <div class="old-price">Was: $${data.oldPrice?.toFixed(2)}</div>
+                <div class="new-price">Now: $${data.newPrice?.toFixed(2)}</div>
+                <div class="savings">Save $${savings.toFixed(2)} (${savingsPercent}% off)!</div>
+              </div>
+              <p style="text-align: center;">Don't miss out on this deal!</p>
+              <div style="text-align: center;">
+                <a href="${SUPABASE_URL.replace(/\/$/, '')}" class="button">View Product</a>
+              </div>
+            </div>
+            <div class="footer">
+              <p>You're receiving this email because you favorited this product.</p>
+              <p>Manage your notification preferences in Settings.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      break;
 
-      // Log attempt even if API key is missing
-      await supabase.from("email_logs").insert({
-        user_id: recipientId,
-        email_type: emailType,
-        status: "failed",
-        error_message: "RESEND_API_KEY not configured"
-      });
+    case 'new_listing':
+      subject = `🔔 New listing matches your search: ${data.searchName}`;
+      htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .search-badge { display: inline-block; background: #8B5CF6; color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; margin: 10px 0; }
+            .button { display: inline-block; background: #8B5CF6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🔔 New Listing Alert</h1>
+            </div>
+            <div class="content">
+              <p>Great news! A new listing matches your saved search:</p>
+              <div class="search-badge">${data.searchName}</div>
+              <h3>${data.productTitle}</h3>
+              ${data.category ? `<p><strong>Category:</strong> ${data.category}</p>` : ''}
+              <p>Check it out before it's gone!</p>
+              <div style="text-align: center;">
+                <a href="${SUPABASE_URL.replace(/\/$/, '')}" class="button">View Listing</a>
+              </div>
+            </div>
+            <div class="footer">
+              <p>You're receiving this email because of your saved search preferences.</p>
+              <p>Manage your notification preferences in Settings.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      break;
+  }
 
+  // Send email via Resend API
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: 'Limin Market <notifications@liminmarket.com>',
+      to: [to],
+      subject,
+      html: htmlContent,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Resend API error: ${error}`);
+  }
+
+  return await response.json();
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const payload: EmailPayload = await req.json();
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Check user's notification preferences
+    const { data: preferences, error: prefError } = await supabase
+      .from('notification_preferences')
+      .select('*')
+      .eq('user_id', payload.to)
+      .single();
+
+    if (prefError && prefError.code !== 'PGRST116') {
+      throw prefError;
+    }
+
+    // Check if user has this notification type enabled
+    const prefKey = `email_${payload.type.replace('_', '_')}s` as keyof typeof preferences;
+    if (preferences && !preferences[prefKey]) {
       return new Response(
-        JSON.stringify({ warning: "Email API not configured" }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ message: 'User has disabled this notification type' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Limin Market <notifications@liminmarket.com>",
-        to: [recipient.email],
-        subject: emailSubject,
-        html: emailHtml,
-      }),
+    // Send the email
+    const result = await sendEmail(payload);
+
+    // Log the email in email_logs table
+    await supabase.from('email_logs').insert({
+      user_id: payload.to,
+      email_type: payload.type,
+      status: 'sent',
     });
 
-    if (!resendResponse.ok) {
-      const error = await resendResponse.text();
-      throw new Error(`Failed to send email via Resend: ${error}`);
-    }
-
-    const emailResult = await resendResponse.json();
-
-    // Log successful email
-    await supabase.from("email_logs").insert({
-      user_id: recipientId,
-      email_type: emailType,
-      status: "sent"
+    return new Response(JSON.stringify({ success: true, result }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
     });
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: "Email sent successfully",
-        emailId: emailResult.id
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-
   } catch (error) {
-    console.error("Error in send-email-notification:", error);
+    console.error('Error sending email:', error);
 
-    // Log failed email attempt if we have recipient info
+    // Log the error in email_logs table
     try {
-      const body = await req.clone().json();
-      if (body.recipientId) {
-        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-        await supabase.from("email_logs").insert({
-          user_id: body.recipientId,
-          email_type: body.emailType || "new_message",
-          status: "failed",
-          error_message: error instanceof Error ? error.message : "Unknown error"
-        });
-      }
+      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      const payload = await req.json();
+      await supabase.from('email_logs').insert({
+        user_id: payload.to,
+        email_type: payload.type,
+        status: 'failed',
+        error_message: error.message,
+      });
     } catch (logError) {
-      console.error("Failed to log error:", logError);
+      console.error('Failed to log error:', logError);
     }
 
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    });
   }
 });
