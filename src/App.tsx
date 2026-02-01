@@ -1425,24 +1425,18 @@ export default function App() {
                 { name: 'Household', emoji: '🏠' },
                 { name: 'Sports', emoji: '⚽' },
                 { name: 'Vehicles', emoji: '🚗' },
-                { name: 'Books', emoji: '📚' },
+                { name: 'Services', emoji: '🤝' },
               ].map(c => (
                 <button
                   key={c.name}
                   onClick={() => {
-                    setSelectedCategory(c.name);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setCurrentViewCategory(c.name);
+                    setShowCategoryView(true);
                   }}
-                  className={`rounded-lg p-4 text-center hover:shadow-md transition-all cursor-pointer ${
-                    selectedCategory === c.name
-                      ? 'bg-limin-primary text-white shadow-md'
-                      : 'bg-white'
-                  }`}
+                  className="rounded-lg p-4 text-center bg-white hover:shadow-md transition-all cursor-pointer active:scale-95"
                 >
                   <div className="text-3xl mb-2">{c.emoji}</div>
-                  <p className={`text-sm font-medium ${
-                    selectedCategory === c.name ? 'text-white' : 'text-gray-700'
-                  }`}>{c.name}</p>
+                  <p className="text-sm font-medium text-gray-700">{c.name}</p>
                 </button>
               ))}
             </div>
