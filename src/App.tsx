@@ -28,6 +28,12 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Dark mode state - managed globally
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
   const [viewingSellerId, setViewingSellerId] = useState<string | null>(null);
   const [viewingSellerName, setViewingSellerName] = useState<string>('');
   const [showPostForm, setShowPostForm] = useState(false);
@@ -62,6 +68,16 @@ export default function App() {
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
+
+  // Apply dark mode changes
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', String(darkMode));
+  }, [darkMode]);
 
   // Fetch products from Supabase on mount
   useEffect(() => {
@@ -1245,6 +1261,8 @@ export default function App() {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         onAuthClick={() => setShowAuth(true)}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
 
       <UpdatePasswordModal
