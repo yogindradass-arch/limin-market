@@ -33,6 +33,26 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
   const daysUntilExpiration = getDaysUntilExpiration();
   const isExpiringSoon = daysUntilExpiration !== null && daysUntilExpiration <= 7 && daysUntilExpiration > 0;
 
+  // Get category-specific icon for listings without images
+  const getCategoryIcon = () => {
+    switch (product.category) {
+      case 'Services':
+        return '🛠️';
+      case 'Real Estate':
+        return '🏠';
+      case 'Vehicles':
+        return '🚗';
+      case 'Jobs':
+        return '💼';
+      case 'Electronics':
+        return '📱';
+      default:
+        return '📦';
+    }
+  };
+
+  const hasImage = product.image && product.image !== 'null' && product.image !== '';
+
   return (
     <div
       onClick={handleClick}
@@ -40,11 +60,20 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
     >
       {/* Image Section */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
-        <img
-          src={product.image}
-          alt={product.title}
-          className="w-full h-full object-cover"
-        />
+        {hasImage ? (
+          <img
+            src={product.image}
+            alt={product.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-limin-primary/10 to-limin-secondary/10">
+            <div className="text-center">
+              <div className="text-6xl mb-2">{getCategoryIcon()}</div>
+              <div className="text-xs text-gray-500 font-medium px-4">{product.category || 'General'}</div>
+            </div>
+          </div>
+        )}
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
