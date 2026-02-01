@@ -19,10 +19,13 @@ import SettingsModal from './components/SettingsModal';
 import UpdatePasswordModal from './components/UpdatePasswordModal';
 import MessagesModal from './components/MessagesModal';
 import ChatModal from './components/ChatModal';
+import AdvancedSearchModal from './components/AdvancedSearchModal';
+import SavedSearchesList from './components/SavedSearchesList';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import type { Product } from './types/product';
 import type { Conversation } from './types/messages';
+import type { SearchFilters } from './types/search';
 
 export default function App() {
   const { user } = useAuth();
@@ -53,6 +56,11 @@ export default function App() {
   const [sortBy, setSortBy] = useState('newest');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [showFreeOnly, setShowFreeOnly] = useState(false);
+
+  // Advanced Search state
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<SearchFilters>({ categories: [] });
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -767,6 +775,92 @@ export default function App() {
     }
     if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
 
+    // Apply advanced filters
+    if (advancedFilters.categories.length > 0) {
+      filtered = filtered.filter(p => p.category && advancedFilters.categories.includes(p.category));
+    }
+    if (advancedFilters.priceMin !== undefined) {
+      filtered = filtered.filter(p => p.price >= advancedFilters.priceMin!);
+    }
+    if (advancedFilters.priceMax !== undefined) {
+      filtered = filtered.filter(p => p.price <= advancedFilters.priceMax!);
+    }
+    if (advancedFilters.location) {
+      filtered = filtered.filter(p => p.location === advancedFilters.location);
+    }
+    if (advancedFilters.listingType) {
+      filtered = filtered.filter(p => p.listingType === advancedFilters.listingType);
+    }
+    if (advancedFilters.listingMode) {
+      filtered = filtered.filter(p => p.listingMode === advancedFilters.listingMode);
+    }
+
+    // Apply category-specific filters (client-side)
+    // Real Estate
+    if (advancedFilters.bedrooms !== undefined) {
+      filtered = filtered.filter(p => p.bedrooms && p.bedrooms >= advancedFilters.bedrooms!);
+    }
+    if (advancedFilters.bathrooms !== undefined) {
+      filtered = filtered.filter(p => p.bathrooms && p.bathrooms >= advancedFilters.bathrooms!);
+    }
+    if (advancedFilters.propertyType) {
+      filtered = filtered.filter(p => p.propertyType === advancedFilters.propertyType);
+    }
+    if (advancedFilters.listingPurpose) {
+      filtered = filtered.filter(p => p.listingPurpose === advancedFilters.listingPurpose);
+    }
+
+    // Vehicles
+    if (advancedFilters.yearMin !== undefined) {
+      filtered = filtered.filter(p => p.vehicleYear && p.vehicleYear >= advancedFilters.yearMin!);
+    }
+    if (advancedFilters.yearMax !== undefined) {
+      filtered = filtered.filter(p => p.vehicleYear && p.vehicleYear <= advancedFilters.yearMax!);
+    }
+    if (advancedFilters.mileageMax !== undefined) {
+      filtered = filtered.filter(p => p.mileage !== undefined && p.mileage <= advancedFilters.mileageMax!);
+    }
+    if (advancedFilters.vehicleCondition) {
+      filtered = filtered.filter(p => p.vehicleCondition === advancedFilters.vehicleCondition);
+    }
+    if (advancedFilters.transmission) {
+      filtered = filtered.filter(p => p.transmission === advancedFilters.transmission);
+    }
+    if (advancedFilters.fuelType) {
+      filtered = filtered.filter(p => p.fuelType === advancedFilters.fuelType);
+    }
+
+    // Jobs
+    if (advancedFilters.jobType) {
+      filtered = filtered.filter(p => p.jobType === advancedFilters.jobType);
+    }
+    if (advancedFilters.experienceLevel) {
+      filtered = filtered.filter(p => p.experienceLevel === advancedFilters.experienceLevel);
+    }
+    if (advancedFilters.salaryMin !== undefined) {
+      filtered = filtered.filter(p => p.salaryMin !== undefined && p.salaryMin >= advancedFilters.salaryMin!);
+    }
+    if (advancedFilters.salaryMax !== undefined) {
+      filtered = filtered.filter(p => p.salaryMax !== undefined && p.salaryMax <= advancedFilters.salaryMax!);
+    }
+
+    // Services
+    if (advancedFilters.serviceType) {
+      filtered = filtered.filter(p => p.serviceType === advancedFilters.serviceType);
+    }
+    if (advancedFilters.priceType) {
+      filtered = filtered.filter(p => p.priceType === advancedFilters.priceType);
+    }
+    if (advancedFilters.hourlyRateMin !== undefined) {
+      filtered = filtered.filter(p => p.hourlyRate !== undefined && p.hourlyRate >= advancedFilters.hourlyRateMin!);
+    }
+    if (advancedFilters.hourlyRateMax !== undefined) {
+      filtered = filtered.filter(p => p.hourlyRate !== undefined && p.hourlyRate <= advancedFilters.hourlyRateMax!);
+    }
+    if (advancedFilters.responseTime) {
+      filtered = filtered.filter(p => p.responseTime === advancedFilters.responseTime);
+    }
+
     // Apply free only filter
     if (showFreeOnly) {
       filtered = filtered.filter(p => p.price === 0);
@@ -1331,6 +1425,15 @@ export default function App() {
         onClose={() => setShowSearch(false)}
         products={allProducts}
         onProductClick={handleProductClick}
+        onOpenAdvancedSearch={() => {
+          setShowSearch(false);
+          setShowAdvancedSearch(true);
+        }}
+        onOpenSavedSearches={() => {
+          setShowSearch(false);
+          setShowSavedSearches(true);
+        }}
+        advancedFilters={advancedFilters}
       />
 
       <AuthModal
@@ -1408,6 +1511,30 @@ export default function App() {
           setActiveTab('messages'); // Go back to messages list
         }}
       />
+
+      {/* Advanced Search Components */}
+      {showAdvancedSearch && (
+        <AdvancedSearchModal
+          onClose={() => setShowAdvancedSearch(false)}
+          onApplyFilters={(filters) => {
+            setAdvancedFilters(filters);
+            setShowAdvancedSearch(false);
+          }}
+          initialFilters={advancedFilters}
+          userId={user?.id}
+        />
+      )}
+
+      {showSavedSearches && user && (
+        <SavedSearchesList
+          onClose={() => setShowSavedSearches(false)}
+          onApplySearch={(filters) => {
+            setAdvancedFilters(filters);
+            setShowSavedSearches(false);
+          }}
+          userId={user.id}
+        />
+      )}
     </div>
   );
 }

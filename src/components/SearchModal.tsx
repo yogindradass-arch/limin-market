@@ -1,20 +1,35 @@
 import { useState } from 'react';
 import type { Product } from '../types/product';
+import type { SearchFilters } from '../types/search';
+import { countActiveFilters } from '../types/search';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   products: Product[];
   onProductClick: (product: Product) => void;
+  onOpenAdvancedSearch?: () => void;
+  onOpenSavedSearches?: () => void;
+  advancedFilters?: SearchFilters;
 }
 
-export default function SearchModal({ isOpen, onClose, products, onProductClick }: SearchModalProps) {
+export default function SearchModal({
+  isOpen,
+  onClose,
+  products,
+  onProductClick,
+  onOpenAdvancedSearch,
+  onOpenSavedSearches,
+  advancedFilters
+}: SearchModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 });
 
   if (!isOpen) return null;
+
+  const activeAdvancedFiltersCount = advancedFilters ? countActiveFilters(advancedFilters) : 0;
 
   // Filter products based on search criteria
   const filteredProducts = products.filter(product => {
@@ -119,6 +134,47 @@ export default function SearchModal({ isOpen, onClose, products, onProductClick 
               placeholder="Max"
               className="w-20 px-2 py-1 text-sm border border-gray-300 rounded"
             />
+          </div>
+
+          {/* Advanced Search & Saved Searches Buttons */}
+          <div className="flex gap-3 pt-2">
+            {onOpenAdvancedSearch && (
+              <button
+                onClick={onOpenAdvancedSearch}
+                className="flex-1 px-4 py-2 bg-limin-primary text-white rounded-lg font-medium hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  />
+                </svg>
+                <span>Advanced Filters</span>
+                {activeAdvancedFiltersCount > 0 && (
+                  <span className="bg-white text-limin-primary px-2 py-0.5 rounded-full text-xs font-bold">
+                    {activeAdvancedFiltersCount}
+                  </span>
+                )}
+              </button>
+            )}
+            {onOpenSavedSearches && (
+              <button
+                onClick={onOpenSavedSearches}
+                className="flex-1 px-4 py-2 border-2 border-limin-primary text-limin-primary rounded-lg font-medium hover:bg-limin-primary/10 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                  />
+                </svg>
+                <span>Saved Searches</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
