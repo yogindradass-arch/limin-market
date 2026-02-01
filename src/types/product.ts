@@ -1,4 +1,5 @@
 import type { SellerRating } from './review';
+import type { ImageVariants } from '../lib/imageUpload';
 
 export interface Product {
   id: string;
@@ -6,6 +7,7 @@ export interface Product {
   price: number;
   image: string;
   images?: string[];  // Array of all product images
+  imageVariants?: ImageVariants;  // Optimized image variants (thumb, medium, full, original)
   rating: number;
   seller: string;
   sellerId?: string;

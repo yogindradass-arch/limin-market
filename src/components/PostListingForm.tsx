@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { uploadProductImage } from '../lib/imageUpload';
+import { uploadProductImageLegacy as uploadProductImage } from '../lib/imageUpload';
 import { moderateListing } from '../lib/contentModeration';
 import { moderateImage } from '../lib/imageModeration';
 

@@ -102,8 +102,10 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
     }
   };
 
-  // Check if product has a valid image
-  const currentImage = (product.images && product.images.length > 0) ? product.images[currentImageIndex] : product.image;
+  // Check if product has a valid image - use optimized full variant if available
+  const baseImage = (product.images && product.images.length > 0) ? product.images[currentImageIndex] : product.image;
+  const currentImage = product.imageVariants?.full || baseImage;
+  const currentImageThumb = product.imageVariants?.thumb || baseImage;
   const hasImage = currentImage &&
     currentImage !== 'null' &&
     currentImage !== '' &&
@@ -199,6 +201,8 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                   src={currentImage}
                   alt={`${product.title} - Image ${currentImageIndex + 1}`}
                   className="w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-limin-primary/10 to-limin-secondary/10">

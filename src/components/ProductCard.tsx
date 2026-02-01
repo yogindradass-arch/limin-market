@@ -56,6 +56,9 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
     product.image !== '' &&
     !product.image.includes('unsplash.com');
 
+  // Use optimized thumbnail if available, otherwise fall back to regular image
+  const imageUrl = product.imageVariants?.thumb || product.image;
+
   return (
     <div
       onClick={handleClick}
@@ -65,9 +68,11 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
       <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
         {hasImage ? (
           <img
-            src={product.image}
+            src={imageUrl}
             alt={product.title}
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-limin-primary/10 to-limin-secondary/10">
