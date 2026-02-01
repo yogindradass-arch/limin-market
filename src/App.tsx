@@ -777,7 +777,10 @@ export default function App() {
 
     // Apply advanced filters
     if (advancedFilters.categories.length > 0) {
+      console.log('🔍 Advanced category filter:', advancedFilters.categories);
+      console.log('📦 Products before category filter:', filtered.length, filtered.map(p => ({ title: p.title, category: p.category })));
       filtered = filtered.filter(p => p.category && advancedFilters.categories.includes(p.category));
+      console.log('✅ Products after category filter:', filtered.length, filtered.map(p => ({ title: p.title, category: p.category })));
     }
     if (advancedFilters.priceMin !== undefined) {
       filtered = filtered.filter(p => p.price >= advancedFilters.priceMin!);
