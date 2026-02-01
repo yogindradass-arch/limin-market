@@ -564,7 +564,10 @@ export default function App() {
     if (activeFilter === 'Vehicles') filtered = filtered.filter(p => p.category === 'Vehicles');
     if (activeFilter === 'Jobs') filtered = filtered.filter(p => p.category === 'Jobs');
     if (activeFilter === 'Services') filtered = filtered.filter(p => p.category === 'Services');
-    if (activeFilter === 'Under $50') filtered = filtered.filter(p => p.price > 0 && p.price < 50);
+    if (activeFilter === 'Under $50') {
+      // Include free items when showFreeOnly is enabled
+      filtered = filtered.filter(p => showFreeOnly ? (p.price >= 0 && p.price < 50) : (p.price > 0 && p.price < 50));
+    }
     if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
 
     // Apply free only filter
