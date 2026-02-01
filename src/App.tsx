@@ -23,6 +23,7 @@ import AdvancedSearchModal from './components/AdvancedSearchModal';
 import SavedSearchesList from './components/SavedSearchesList';
 import SellerAnalyticsDashboard from './components/SellerAnalyticsDashboard';
 import NotificationPreferencesModal from './components/NotificationPreferencesModal';
+import AdminModerationDashboard from './components/AdminModerationDashboard';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -66,6 +67,10 @@ export default function App() {
   const [showSavedSearches, setShowSavedSearches] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<SearchFilters>({ categories: [] });
   const [showAnalytics, setShowAnalytics] = useState(false);
+
+  // Admin state
+  const [userRole, setUserRole] = useState<'user' | 'admin'>('user');
+  const [pendingReportsCount, setPendingReportsCount] = useState(0);
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -124,6 +129,77 @@ export default function App() {
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  // Fetch user role and admin data
+  useEffect(() => {
+    if (!user) {
+      setUserRole('user');
+      setPendingReportsCount(0);
+      return;
+    }
+
+    fetchUserRole();
+    fetchPendingReportsCount();
+
+    // Subscribe to reports changes for real-time count updates
+    const channel = supabase
+      .channel('reports_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reports',
+        },
+        () => {
+          fetchPendingReportsCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  const fetchUserRole = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return;
+      }
+
+      setUserRole(data?.role || 'user');
+    } catch (err) {
+      console.error('Error fetching user role:', err);
+    }
+  };
+
+  const fetchPendingReportsCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      if (error) {
+        console.error('Error fetching pending reports count:', error);
+        return;
+      }
+
+      setPendingReportsCount(count || 0);
+    } catch (err) {
+      console.error('Error fetching pending reports count:', err);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -1350,6 +1426,8 @@ export default function App() {
         onTabChange={handleTabChange}
         onSearchClick={() => setShowSearch(true)}
         unreadMessagesCount={totalUnreadCount}
+        isAdmin={userRole === 'admin'}
+        pendingReportsCount={pendingReportsCount}
       />
       <FAB onClick={() => setShowPostForm(true)} />
 
@@ -1527,6 +1605,18 @@ export default function App() {
           onClose={() => setShowAnalytics(false)}
           sellerId={user.id}
           sellerName={user.email?.split('@')[0] || 'User'}
+        />
+      )}
+
+      {/* Admin Dashboard */}
+      {activeTab === 'admin' && userRole === 'admin' && user && (
+        <AdminModerationDashboard
+          onClose={() => setActiveTab('home')}
+          adminId={user.id}
+          onProductClick={(product) => {
+            setSelectedProduct(product);
+            setActiveTab('home');
+          }}
         />
       )}
 

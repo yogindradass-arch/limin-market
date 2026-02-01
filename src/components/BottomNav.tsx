@@ -3,14 +3,26 @@ interface BottomNavProps {
   onTabChange: (tab: string) => void;
   onSearchClick?: () => void;
   unreadMessagesCount?: number;
+  isAdmin?: boolean;
+  pendingReportsCount?: number;
 }
 
-export default function BottomNav({ activeTab, onTabChange, onSearchClick, unreadMessagesCount = 0 }: BottomNavProps) {
+export default function BottomNav({
+  activeTab,
+  onTabChange,
+  onSearchClick,
+  unreadMessagesCount = 0,
+  isAdmin = false,
+  pendingReportsCount = 0
+}: BottomNavProps) {
   const tabs = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'search', label: 'Search', icon: SearchIcon },
-    { id: 'local', label: 'Local', icon: LocationIcon },
-    { id: 'messages', label: 'Messages', icon: MessagesIcon },
+    // Show Admin tab instead of Local tab for admins
+    isAdmin
+      ? { id: 'admin', label: 'Admin', icon: AdminIcon, badge: pendingReportsCount }
+      : { id: 'local', label: 'Local', icon: LocationIcon },
+    { id: 'messages', label: 'Messages', icon: MessagesIcon, badge: unreadMessagesCount },
     { id: 'account', label: 'Account', icon: AccountIcon },
   ];
 
@@ -35,10 +47,10 @@ export default function BottomNav({ activeTab, onTabChange, onSearchClick, unrea
             >
               <div className="relative">
                 <Icon isActive={isActive} />
-                {/* Unread badge for messages tab */}
-                {tab.id === 'messages' && unreadMessagesCount > 0 && (
+                {/* Badge for messages and admin tabs */}
+                {'badge' in tab && tab.badge && tab.badge > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    {tab.badge > 9 ? '9+' : tab.badge}
                   </span>
                 )}
               </div>
@@ -148,6 +160,24 @@ function AccountIcon({ isActive }: { isActive: boolean }) {
         strokeLinejoin="round"
         strokeWidth={2}
         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
+    </svg>
+  );
+}
+
+function AdminIcon({ isActive }: { isActive: boolean }) {
+  return (
+    <svg
+      className={`w-6 h-6 ${isActive ? 'text-red-600' : 'text-gray-600'}`}
+      fill={isActive ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
       />
     </svg>
   );
