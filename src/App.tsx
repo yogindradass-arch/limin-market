@@ -28,6 +28,8 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [viewingSellerId, setViewingSellerId] = useState<string | null>(null);
+  const [viewingSellerName, setViewingSellerName] = useState<string>('');
   const [showPostForm, setShowPostForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -179,6 +181,17 @@ export default function App() {
 
   const closeModal = () => {
     setSelectedProduct(null);
+  };
+
+  const handleViewSellerProfile = (sellerId: string, sellerName: string) => {
+    setViewingSellerId(sellerId);
+    setViewingSellerName(sellerName);
+    setSelectedProduct(null); // Close product modal
+  };
+
+  const closeSellerProfile = () => {
+    setViewingSellerId(null);
+    setViewingSellerName('');
   };
 
   const handlePostListing = async (listingData: ListingFormData) => {
@@ -1015,7 +1028,66 @@ export default function App() {
           onReport={handleReportListing}
           onMarkAsSold={handleMarkAsSold}
           onExtendListing={handleExtendListing}
+          onViewSellerProfile={handleViewSellerProfile}
         />
+      )}
+
+      {/* Seller Profile Modal */}
+      {viewingSellerId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={closeSellerProfile}>
+          <div
+            className="bg-white rounded-t-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b z-10 px-6 py-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-limin-primary to-orange-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    {viewingSellerName.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-limin-dark">{viewingSellerName}</h2>
+                    <p className="text-sm text-gray-600">
+                      {allProducts.filter(p => p.sellerId === viewingSellerId).length} listing{allProducts.filter(p => p.sellerId === viewingSellerId).length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={closeSellerProfile}
+                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                >
+                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Seller's Listings */}
+            <div className="p-6">
+              {allProducts.filter(p => p.sellerId === viewingSellerId).length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {allProducts
+                    .filter(p => p.sellerId === viewingSellerId)
+                    .map(p => (
+                      <ProductCard
+                        key={p.id}
+                        product={{...p, isFavorited: favorites.has(p.id)}}
+                        onProductClick={handleProductClick}
+                        onFavoriteToggle={toggleFav}
+                      />
+                    ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">📦</div>
+                  <p className="text-gray-600">No active listings</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {showPostForm && (
