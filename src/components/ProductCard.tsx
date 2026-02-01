@@ -148,7 +148,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
         </p>
 
         {/* Title */}
-        <h3 className="text-sm text-gray-700 dark:text-gray-300 mb-2 line-clamp-2 leading-snug">
+        <h3 className="text-sm text-gray-900 dark:text-gray-300 mb-2 line-clamp-2 leading-snug font-medium">
           {product.title}
         </h3>
 
