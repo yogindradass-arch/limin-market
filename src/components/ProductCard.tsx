@@ -59,10 +59,10 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
   return (
     <div
       onClick={handleClick}
-      className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer relative"
+      className="bg-white dark:bg-dark-surface rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border border-transparent dark:border-dark-border"
     >
       {/* Image Section */}
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+      <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
         {hasImage ? (
           <img
             src={product.image}
@@ -130,7 +130,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
       {/* Content Section */}
       <div className="p-3">
         {/* Price */}
-        <p className="text-lg font-bold text-limin-dark mb-1">
+        <p className="text-lg font-bold text-limin-dark dark:text-dark-text mb-1">
           {product.listingMode === 'seeking' ? (
             product.price === 0 ? (
               <span className="text-purple-600">Budget: Negotiable</span>
@@ -143,7 +143,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
         </p>
 
         {/* Title */}
-        <h3 className="text-sm text-gray-700 mb-2 line-clamp-2 leading-snug">
+        <h3 className="text-sm text-gray-700 dark:text-gray-300 mb-2 line-clamp-2 leading-snug">
           {product.title}
         </h3>
 

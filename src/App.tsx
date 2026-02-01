@@ -1072,7 +1072,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 pb-16">
+    <div className="min-h-screen bg-gray-100 dark:bg-dark-bg pb-16 transition-colors duration-200">
       <Header onMenuClick={() => setShowMenu(true)} onSearchClick={() => setShowSearch(true)} />
       <LocationBar location={`${currentLocation}, Guyana`} onLocationClick={() => setShowLocationSelector(true)} />
       {activeTab === 'home' && <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />}

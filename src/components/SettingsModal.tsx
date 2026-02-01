@@ -73,7 +73,7 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl">
+        <div className="relative w-full max-w-lg bg-white dark:bg-dark-surface rounded-2xl shadow-xl transition-colors duration-200">
           {/* Close Button */}
           <button
             onClick={onClose}
