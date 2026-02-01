@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: light;
-  }
-}
-
 @theme {
   --color-limin-primary: #FF6B35;
   --color-limin-secondary: #00B48D;

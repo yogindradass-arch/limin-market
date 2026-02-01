@@ -1,8 +1,6 @@
 export default {
   plugins: {
-    '@tailwindcss/postcss': {
-      darkMode: 'selector',
-    },
+    '@tailwindcss/postcss': {},
     autoprefixer: {},
   },
 }
