@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 interface SettingsModalProps {
@@ -10,8 +10,23 @@ interface SettingsModalProps {
 export default function SettingsModal({ isOpen, onClose, onAuthClick }: SettingsModalProps) {
   const { user, signOut } = useAuth();
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Load dark mode preference from localStorage
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
   const [showPhone, setShowPhone] = useState(true);
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Save to localStorage
+    localStorage.setItem('darkMode', String(darkMode));
+  }, [darkMode]);
 
   if (!isOpen) return null;
 
@@ -139,14 +154,14 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
                 <div className="flex items-center justify-between py-3 border-b">
                   <div>
                     <p className="font-medium text-gray-800">Dark Mode</p>
-                    <p className="text-sm text-gray-500">Coming soon</p>
+                    <p className="text-sm text-gray-500">Switch between light and dark theme</p>
                   </div>
                   <button
                     onClick={() => setDarkMode(!darkMode)}
-                    disabled
-                    className={`relative w-12 h-7 rounded-full transition-colors opacity-50 cursor-not-allowed ${
+                    className={`relative w-12 h-7 rounded-full transition-colors ${
                       darkMode ? 'bg-limin-primary' : 'bg-gray-300'
                     }`}
+                    aria-label="Toggle dark mode"
                   >
                     <span
                       className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${

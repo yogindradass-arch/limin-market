@@ -68,6 +68,11 @@ export default function App() {
     fetchProducts();
   }, []);
 
+  // Fetch favorites when user changes
+  useEffect(() => {
+    fetchFavorites();
+  }, [user]);
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -167,12 +172,73 @@ export default function App() {
   const dollarItems = products.filter(p => p.price > 0 && p.price <= 50);
   const freeItems = products.filter(p => p.price === 0);
 
-  const toggleFav = (id: string) => {
+  // Fetch favorites from database
+  const fetchFavorites = async () => {
+    if (!user) {
+      setFavorites(new Set());
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('product_id')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching favorites:', error);
+        return;
+      }
+
+      setFavorites(new Set(data.map(f => f.product_id)));
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+    }
+  };
+
+  const toggleFav = async (id: string) => {
+    if (!user) {
+      alert('Please sign in to save favorites');
+      return;
+    }
+
+    const isFavorited = favorites.has(id);
+
+    // Optimistic update
     setFavorites(f => {
       const n = new Set(f);
-      n.has(id) ? n.delete(id) : n.add(id);
+      isFavorited ? n.delete(id) : n.add(id);
       return n;
     });
+
+    try {
+      if (isFavorited) {
+        // Remove from favorites
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('product_id', id);
+
+        if (error) throw error;
+      } else {
+        // Add to favorites
+        const { error } = await supabase
+          .from('favorites')
+          .insert({ user_id: user.id, product_id: id });
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Revert optimistic update on error
+      setFavorites(f => {
+        const n = new Set(f);
+        isFavorited ? n.add(id) : n.delete(id);
+        return n;
+      });
+      alert('Failed to update favorite. Please try again.');
+    }
   };
 
   const handleProductClick = (product: Product) => {
