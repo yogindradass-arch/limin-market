@@ -187,15 +187,9 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
                   <span className="text-gray-600">Version</span>
                   <span className="font-medium text-gray-800">1.0.0</span>
                 </div>
-                <div className="flex justify-between py-2 border-b">
+                <div className="flex justify-between py-2">
                   <span className="text-gray-600">Last Updated</span>
                   <span className="font-medium text-gray-800">January 2026</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-600">Database Status</span>
-                  <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-medium">
-                    Demo Mode
-                  </span>
                 </div>
               </div>
             </section>
