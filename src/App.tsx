@@ -755,16 +755,11 @@ export default function App() {
 
   // Filter products based on active filter and category
   const getFilteredProducts = (products: Product[]) => {
-    console.log('🎯 START getFilteredProducts:', products.length, 'products');
-    console.log('🎯 Products:', products.map(p => ({ title: p.title, category: p.category })));
-    console.log('🎯 activeFilter:', activeFilter, 'selectedCategory:', selectedCategory);
     let filtered = products;
 
     // Apply category filter first
     if (selectedCategory) {
-      console.log('🔍 Applying selectedCategory filter:', selectedCategory);
       filtered = filtered.filter(p => p.category === selectedCategory);
-      console.log('📦 After selectedCategory:', filtered.length);
     }
 
     // Apply active filter
@@ -779,14 +774,10 @@ export default function App() {
       filtered = filtered.filter(p => showFreeOnly ? (p.price >= 0 && p.price < 50) : (p.price > 0 && p.price < 50));
     }
     if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
-    console.log('📦 After activeFilter:', filtered.length);
 
     // Apply advanced filters
     if (advancedFilters.categories.length > 0) {
-      console.log('🔍 Advanced category filter:', advancedFilters.categories);
-      console.log('📦 Products before category filter:', filtered.length, filtered.map(p => ({ title: p.title, category: p.category })));
       filtered = filtered.filter(p => p.category && advancedFilters.categories.includes(p.category));
-      console.log('✅ Products after category filter:', filtered.length, filtered.map(p => ({ title: p.title, category: p.category })));
     }
     if (advancedFilters.priceMin !== undefined) {
       filtered = filtered.filter(p => p.price >= advancedFilters.priceMin!);
