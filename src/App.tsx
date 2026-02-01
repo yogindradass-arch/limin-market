@@ -1338,31 +1338,46 @@ export default function App() {
             )}
 
             <div className="px-4 py-6 space-y-6">
+              {/* Popular Categories */}
               <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-limin-dark flex items-center">
-                    <span className="text-2xl mr-2">💰</span>Dollar Express
-                  </h2>
-                  {filteredDollarItems.length > 0 && (
-                    <button className="text-sm text-limin-primary font-medium">See All →</button>
-                  )}
+                <h2 className="text-lg font-bold text-limin-dark mb-4">Popular Categories</h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('Jobs');
+                      setActiveFilter('All');
+                    }}
+                    className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all active:scale-95"
+                  >
+                    <div className="text-3xl mb-2">💼</div>
+                    <div className="text-sm font-semibold text-gray-900">Jobs</div>
+                    <div className="text-xs text-gray-500 mt-1">Find work</div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('Vehicles');
+                      setActiveFilter('All');
+                    }}
+                    className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all active:scale-95"
+                  >
+                    <div className="text-3xl mb-2">🚗</div>
+                    <div className="text-sm font-semibold text-gray-900">Vehicles</div>
+                    <div className="text-xs text-gray-500 mt-1">Cars & more</div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('Services');
+                      setActiveFilter('All');
+                    }}
+                    className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all active:scale-95"
+                  >
+                    <div className="text-3xl mb-2">🤝</div>
+                    <div className="text-sm font-semibold text-gray-900">Services</div>
+                    <div className="text-xs text-gray-500 mt-1">Get help</div>
+                  </button>
                 </div>
-                {filteredDollarItems.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-3">
-                    {filteredDollarItems.map(p => (
-                      <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-2xl p-6 text-center">
-                    <div className="text-4xl mb-3">💸</div>
-                    <p className="text-sm text-gray-600">
-                      {allProducts.length > 0 && activeFilter !== 'All'
-                        ? `No items under $50 match the "${activeFilter}" filter.`
-                        : "No affordable items yet. Post budget-friendly deals!"}
-                    </p>
-                  </div>
-                )}
               </section>
 
               <section>
