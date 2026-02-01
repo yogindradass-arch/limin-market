@@ -238,6 +238,166 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                 </div>
               )}
 
+              {/* Specs Grid - Category Specific Details */}
+              {(product.category === 'Real Estate' || product.category === 'Vehicles' || product.category === 'Jobs' || product.category === 'Services') && (
+                <div>
+                  <h3 className="text-lg font-semibold text-limin-dark mb-3">Details</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Real Estate Specs */}
+                    {product.category === 'Real Estate' && (
+                      <>
+                        {product.bedrooms && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Bedrooms</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.bedrooms}</div>
+                          </div>
+                        )}
+                        {product.bathrooms && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Bathrooms</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.bathrooms}</div>
+                          </div>
+                        )}
+                        {product.squareFeet && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Square Feet</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.squareFeet.toLocaleString()}</div>
+                          </div>
+                        )}
+                        {product.propertyType && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Property Type</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.propertyType}</div>
+                          </div>
+                        )}
+                        {product.listingPurpose && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Listing Purpose</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.listingPurpose}</div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Vehicle Specs */}
+                    {product.category === 'Vehicles' && (
+                      <>
+                        {product.vehicleYear && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Year</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.vehicleYear}</div>
+                          </div>
+                        )}
+                        {product.vehicleMake && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Make</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.vehicleMake}</div>
+                          </div>
+                        )}
+                        {product.vehicleModel && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Model</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.vehicleModel}</div>
+                          </div>
+                        )}
+                        {product.mileage && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Mileage</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.mileage.toLocaleString()} mi</div>
+                          </div>
+                        )}
+                        {product.vehicleCondition && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Condition</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.vehicleCondition}</div>
+                          </div>
+                        )}
+                        {product.transmission && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Transmission</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.transmission}</div>
+                          </div>
+                        )}
+                        {product.fuelType && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Fuel Type</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.fuelType}</div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Job Specs */}
+                    {product.category === 'Jobs' && (
+                      <>
+                        {product.jobType && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Job Type</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.jobType}</div>
+                          </div>
+                        )}
+                        {product.experienceLevel && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Experience Level</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.experienceLevel}</div>
+                          </div>
+                        )}
+                        {product.company && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Company</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.company}</div>
+                          </div>
+                        )}
+                        {(product.salaryMin || product.salaryMax) && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Salary Range</div>
+                            <div className="text-base font-semibold text-limin-dark">
+                              ${product.salaryMin?.toLocaleString() || '0'} - ${product.salaryMax?.toLocaleString() || '0'}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Service Specs */}
+                    {product.category === 'Services' && (
+                      <>
+                        {product.serviceType && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Service Type</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.serviceType}</div>
+                          </div>
+                        )}
+                        {product.priceType && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Price Type</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.priceType}</div>
+                          </div>
+                        )}
+                        {product.hourlyRate && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Hourly Rate</div>
+                            <div className="text-base font-semibold text-limin-dark">${product.hourlyRate}</div>
+                          </div>
+                        )}
+                        {product.responseTime && (
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Response Time</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.responseTime}</div>
+                          </div>
+                        )}
+                        {product.serviceArea && (
+                          <div className="bg-gray-50 p-3 rounded-lg col-span-2">
+                            <div className="text-xs text-gray-500 mb-1">Service Area</div>
+                            <div className="text-base font-semibold text-limin-dark">{product.serviceArea}</div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Seller Info */}
               <div className="border-t pt-6">
                 <h3 className="text-lg font-semibold text-limin-dark mb-3">Seller Information</h3>
