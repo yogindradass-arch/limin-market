@@ -22,6 +22,7 @@ import ChatModal from './components/ChatModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
 import SavedSearchesList from './components/SavedSearchesList';
 import SellerAnalyticsDashboard from './components/SellerAnalyticsDashboard';
+import NotificationPreferencesModal from './components/NotificationPreferencesModal';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -47,6 +48,7 @@ export default function App() {
   const [showAbout, setShowAbout] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showNotificationPreferences, setShowNotificationPreferences] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('Georgetown');
 
   // Messaging state
@@ -1507,7 +1509,17 @@ export default function App() {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         onAuthClick={() => setShowAuth(true)}
+        onNotificationsClick={() => setShowNotificationPreferences(true)}
       />
+
+      {/* Notification Preferences Modal */}
+      {user && (
+        <NotificationPreferencesModal
+          isOpen={showNotificationPreferences}
+          onClose={() => setShowNotificationPreferences(false)}
+          userId={user.id}
+        />
+      )}
 
       {/* Analytics Dashboard */}
       {showAnalytics && user && (

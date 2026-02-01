@@ -5,9 +5,10 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAuthClick?: () => void;
+  onNotificationsClick?: () => void;
 }
 
-export default function SettingsModal({ isOpen, onClose, onAuthClick }: SettingsModalProps) {
+export default function SettingsModal({ isOpen, onClose, onAuthClick, onNotificationsClick }: SettingsModalProps) {
   const { user, signOut } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [showPhone, setShowPhone] = useState(true);
@@ -135,7 +136,7 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
                 </div>
 
                 {/* Show Phone Number */}
-                <div className="flex items-center justify-between py-3">
+                <div className="flex items-center justify-between py-3 border-b">
                   <div>
                     <p className="font-medium text-gray-800">Show My Phone Number</p>
                     <p className="text-sm text-gray-500">Display on your listings</p>
@@ -154,6 +155,29 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
                     />
                   </button>
                 </div>
+
+                {/* Email Notifications */}
+                {user && (
+                  <button
+                    onClick={onNotificationsClick}
+                    className="w-full py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-dark-bg rounded-lg px-2 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium text-gray-800 dark:text-dark-text">Email Notifications</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage email preferences</p>
+                      </div>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </section>
 
