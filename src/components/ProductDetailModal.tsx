@@ -305,10 +305,10 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                     product.price === 0 ? (
                       <span className="text-purple-600">Budget: Negotiable</span>
                     ) : (
-                      <span className="text-purple-600">Budget: ${product.price.toFixed(2)}</span>
+                      <span className="text-purple-600">Budget: ${product.price.toFixed(2)} GYD</span>
                     )
                   ) : (
-                    product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)}`
+                    product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)} GYD`
                   )}
                 </div>
                 <h2 className="text-2xl font-bold text-limin-dark mb-3">{product.title}</h2>
@@ -468,7 +468,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                           <div className="bg-gray-50 p-3 rounded-lg">
                             <div className="text-xs text-gray-500 mb-1">Salary Range</div>
                             <div className="text-base font-semibold text-limin-dark">
-                              ${product.salaryMin?.toLocaleString() || '0'} - ${product.salaryMax?.toLocaleString() || '0'}
+                              ${product.salaryMin?.toLocaleString() || '0'} - ${product.salaryMax?.toLocaleString() || '0'} GYD
                             </div>
                           </div>
                         )}
@@ -493,7 +493,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                         {product.hourlyRate && (
                           <div className="bg-gray-50 p-3 rounded-lg">
                             <div className="text-xs text-gray-500 mb-1">Hourly Rate</div>
-                            <div className="text-base font-semibold text-limin-dark">${product.hourlyRate}</div>
+                            <div className="text-base font-semibold text-limin-dark">${product.hourlyRate} GYD</div>
                           </div>
                         )}
                         {product.responseTime && (

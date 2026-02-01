@@ -12,7 +12,7 @@ export default function ShareButton({ product }: ShareButtonProps) {
   // Create a shareable URL (in production, this would be your actual domain)
   const shareUrl = `${window.location.origin}?product=${product.id}`;
   const shareTitle = product.title;
-  const shareText = `Check out this listing: ${product.title} - ${product.price === 0 ? 'FREE' : '$' + product.price}`;
+  const shareText = `Check out this listing: ${product.title} - ${product.price === 0 ? 'FREE' : '$' + product.price + ' GYD'}`;
 
   // Check if Web Share API is available
   const canUseWebShare = typeof navigator !== 'undefined' && navigator.share !== undefined;

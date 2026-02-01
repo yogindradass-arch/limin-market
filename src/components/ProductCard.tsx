@@ -140,10 +140,10 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
             product.price === 0 ? (
               <span className="text-purple-600">Budget: Negotiable</span>
             ) : (
-              <span className="text-purple-600">Budget: ${product.price.toFixed(2)}</span>
+              <span className="text-purple-600">Budget: ${product.price.toFixed(2)} GYD</span>
             )
           ) : (
-            product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)}`
+            product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)} GYD`
           )}
         </p>
 
@@ -175,25 +175,25 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
         )}
 
         {product.category === 'Jobs' && (product.jobType || product.experienceLevel || product.salaryMin) && (
-          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1 flex-wrap">
             {product.jobType && <span>{product.jobType}</span>}
             {product.jobType && product.experienceLevel && <span>•</span>}
             {product.experienceLevel && <span>{product.experienceLevel}</span>}
             {(product.jobType || product.experienceLevel) && (product.salaryMin || product.salaryMax) && <span>•</span>}
             {(product.salaryMin || product.salaryMax) && (
-              <span>
-                ${product.salaryMin?.toLocaleString() || '0'}-{product.salaryMax?.toLocaleString() || '0'}
+              <span className="whitespace-nowrap">
+                ${product.salaryMin?.toLocaleString() || '0'}-${product.salaryMax?.toLocaleString() || '0'} GYD
               </span>
             )}
           </div>
         )}
 
         {product.category === 'Services' && (product.serviceType || product.priceType || product.responseTime) && (
-          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1">
+          <div className="text-xs text-gray-600 mb-2 flex items-center gap-1 flex-wrap">
             {product.serviceType && <span>{product.serviceType}</span>}
             {product.serviceType && product.priceType && <span>•</span>}
             {product.priceType && product.hourlyRate && (
-              <span>${product.hourlyRate}/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
+              <span className="whitespace-nowrap">${product.hourlyRate} GYD/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
             )}
             {(product.serviceType || product.priceType) && product.responseTime && <span>•</span>}
             {product.responseTime && <span>{product.responseTime}</span>}

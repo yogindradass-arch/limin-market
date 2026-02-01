@@ -86,7 +86,7 @@ export default function TrendingSection({ products, onProductClick }: TrendingSe
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-limin-primary">
-                  {product.price === 0 ? 'FREE' : `$${product.price.toLocaleString()}`}
+                  {product.price === 0 ? 'FREE' : `$${product.price.toLocaleString()} GYD`}
                 </span>
                 <div className="flex items-center gap-1 text-[10px] text-gray-500">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

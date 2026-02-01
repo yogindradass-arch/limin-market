@@ -214,7 +214,7 @@ export default function SearchModal({
                     <p className="text-sm text-gray-600 line-clamp-2 mt-1">{product.description}</p>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-lg font-bold text-limin-primary">
-                        {product.price === 0 ? 'FREE' : `$${product.price}`}
+                        {product.price === 0 ? 'FREE' : `$${product.price} GYD`}
                       </span>
                       <span className="text-sm text-gray-500">{product.location}</span>
                     </div>
