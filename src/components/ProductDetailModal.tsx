@@ -105,7 +105,6 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
   // Check if product has a valid image - use optimized full variant if available
   const baseImage = (product.images && product.images.length > 0) ? product.images[currentImageIndex] : product.image;
   const currentImage = product.imageVariants?.full || baseImage;
-  const currentImageThumb = product.imageVariants?.thumb || baseImage;
   const hasImage = currentImage &&
     currentImage !== 'null' &&
     currentImage !== '' &&
