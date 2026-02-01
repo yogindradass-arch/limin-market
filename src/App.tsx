@@ -866,20 +866,16 @@ export default function App() {
                 <span className="text-2xl mr-2">🆕</span>Recently Posted
               </h2>
             </div>
-            {getFilteredProducts(allProducts).length > 0 ? (
+            {allProducts.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
-                {getFilteredProducts(allProducts).slice(0, 10).map(p => (
+                {allProducts.slice(0, 10).map(p => (
                   <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
                 ))}
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-6 text-center">
                 <div className="text-4xl mb-3">📦</div>
-                <p className="text-sm text-gray-600">
-                  {allProducts.length > 0
-                    ? `No items match the "${activeFilter}" filter. Try selecting "All" to see all listings.`
-                    : "No listings yet. Be the first to post!"}
-                </p>
+                <p className="text-sm text-gray-600">No listings yet. Be the first to post!</p>
               </div>
             )}
           </section>
