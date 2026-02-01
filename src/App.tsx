@@ -32,6 +32,11 @@ export default function App() {
   // Dark mode state - managed globally
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
+    // Default to false (light mode) if not set
+    if (saved === null || saved === undefined) {
+      localStorage.setItem('darkMode', 'false');
+      return false;
+    }
     return saved === 'true';
   });
   const [viewingSellerId, setViewingSellerId] = useState<string | null>(null);
@@ -71,12 +76,14 @@ export default function App() {
 
   // Apply dark mode changes
   useEffect(() => {
+    console.log('Dark mode state changed:', darkMode);
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
     localStorage.setItem('darkMode', String(darkMode));
+    console.log('Applied dark mode:', darkMode, 'HTML classes:', document.documentElement.className);
   }, [darkMode]);
 
   // Fetch products from Supabase on mount

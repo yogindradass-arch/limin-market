@@ -28,12 +28,23 @@
     <script>
       // Initialize dark mode before page loads to prevent flash
       (function() {
+        const darkModeValue = localStorage.getItem('darkMode');
+
+        // Default to false (light mode) if not set
+        if (darkModeValue === null || darkModeValue === undefined) {
+          localStorage.setItem('darkMode', 'false');
+        }
+
         const darkMode = localStorage.getItem('darkMode') === 'true';
+
         if (darkMode) {
           document.documentElement.classList.add('dark');
         } else {
           document.documentElement.classList.remove('dark');
         }
+
+        // Debug log (remove in production)
+        console.log('Dark mode initialized:', darkMode, 'localStorage value:', localStorage.getItem('darkMode'));
       })();
     </script>
   </head>
