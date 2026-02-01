@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { SearchFilters, SavedSearchFormData } from '../types/search';
+import { useState } from 'react';
+import type { SearchFilters } from '../types/search';
 import { countActiveFilters, getFilterSummary } from '../types/search';
 import CategorySpecificFilters from './CategorySpecificFilters';
 import { supabase } from '../lib/supabase';
