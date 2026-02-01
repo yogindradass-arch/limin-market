@@ -1519,6 +1519,10 @@ export default function App() {
           onApplyFilters={(filters) => {
             setAdvancedFilters(filters);
             setShowAdvancedSearch(false);
+            // Navigate to home tab to show filtered results
+            setActiveTab('home');
+            setActiveFilter('All');
+            setSelectedCategory(null);
           }}
           initialFilters={advancedFilters}
           userId={user?.id}
@@ -1531,6 +1535,10 @@ export default function App() {
           onApplySearch={(filters) => {
             setAdvancedFilters(filters);
             setShowSavedSearches(false);
+            // Navigate to home tab to show filtered results
+            setActiveTab('home');
+            setActiveFilter('All');
+            setSelectedCategory(null);
           }}
           userId={user.id}
         />
