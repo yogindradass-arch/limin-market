@@ -27,11 +27,36 @@ export default function HeroSection({ totalListings, newToday, location, onPostC
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-limin-primary via-orange-500 to-limin-secondary px-4 pt-8 pb-6 mb-4">
-      {/* Animated background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+    <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-yellow-500 to-green-600 px-4 pt-8 pb-6 mb-4">
+      {/* Guyana-themed background pattern - WhatsApp style */}
+      <div className="absolute inset-0 opacity-15">
+        {/* Waterfall (Kaieteur Falls) */}
+        <div className="absolute top-4 right-8 text-6xl transform rotate-12">💧</div>
+        <div className="absolute top-6 right-10 text-4xl transform rotate-12">💦</div>
+
+        {/* Tropical Birds */}
+        <div className="absolute top-12 left-6 text-5xl transform -rotate-12">🦜</div>
+        <div className="absolute bottom-16 right-12 text-4xl transform rotate-45">🦩</div>
+
+        {/* Palm Trees */}
+        <div className="absolute bottom-8 left-4 text-6xl">🌴</div>
+        <div className="absolute top-20 right-16 text-5xl transform -rotate-12">🌴</div>
+
+        {/* Tropical Flowers */}
+        <div className="absolute top-32 left-12 text-4xl transform rotate-45">🌺</div>
+        <div className="absolute bottom-20 right-6 text-5xl">🌸</div>
+        <div className="absolute top-16 right-4 text-3xl transform -rotate-12">🏵️</div>
+
+        {/* Local Fruits */}
+        <div className="absolute bottom-28 left-16 text-4xl transform rotate-12">🥥</div>
+        <div className="absolute top-24 left-20 text-3xl">🍍</div>
+
+        {/* Stars/sparkles for Georgetown vibes */}
+        <div className="absolute top-8 left-24 text-2xl">✨</div>
+        <div className="absolute bottom-12 right-20 text-3xl">⭐</div>
+
+        {/* Bridge (Demerara Harbour Bridge) */}
+        <div className="absolute bottom-4 left-8 text-4xl transform rotate-6">🌉</div>
       </div>
 
       <div className="relative z-10">
