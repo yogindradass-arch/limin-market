@@ -128,6 +128,7 @@ export default function App() {
             status: item.status || 'active',
             expiresAt: item.expires_at,
             createdAt: item.created_at,
+            views: item.views || 0,
             // Real Estate fields
             bedrooms: item.bedrooms,
             bathrooms: item.bathrooms,

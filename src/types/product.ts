@@ -18,6 +18,7 @@ export interface Product {
   status?: 'active' | 'sold' | 'expired';
   expiresAt?: string;
   createdAt?: string;
+  views?: number;
   // Real Estate fields
   bedrooms?: number;
   bathrooms?: number;

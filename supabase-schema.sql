@@ -121,6 +121,16 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- Function to increment product views
+CREATE OR REPLACE FUNCTION increment_product_views(product_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE products
+  SET views = COALESCE(views, 0) + 1
+  WHERE id = product_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

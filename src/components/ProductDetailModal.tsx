@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Product } from '../types/product';
 import { useAuth } from '../context/AuthContext';
 import ShareButton from './ShareButton';
+import { supabase } from '../lib/supabase';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -22,6 +23,27 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Track view when modal opens
+  useEffect(() => {
+    if (isOpen && product) {
+      const incrementViews = async () => {
+        try {
+          const { error } = await supabase.rpc('increment_product_views', {
+            product_id: product.id
+          });
+
+          if (error) {
+            console.error('Error incrementing views:', error);
+          }
+        } catch (error) {
+          console.error('Error incrementing views:', error);
+        }
+      };
+
+      incrementViews();
+    }
+  }, [isOpen, product?.id]);
 
   if (!isOpen || !product) return null;
 
@@ -237,6 +259,18 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                   </div>
                   <span className="text-gray-400">•</span>
                   <span>{product.timeAgo}</span>
+                  {product.views !== undefined && product.views > 0 && (
+                    <>
+                      <span className="text-gray-400">•</span>
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>{product.views} {product.views === 1 ? 'view' : 'views'}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
