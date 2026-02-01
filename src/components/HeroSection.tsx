@@ -35,17 +35,26 @@ export default function HeroSection({ totalListings, newToday, location }: HeroS
           <p className="text-gray-600 text-sm">Your community marketplace is buzzing</p>
         </div>
 
-        {/* Live Stats */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-gray-900 text-sm font-medium">{totalListings} active</span>
-          </div>
-          {newToday > 0 && (
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2">
-              <span className="text-gray-900 text-sm font-medium">✨ {newToday} new today</span>
+        {/* Live Stats - Card Style */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Active Listings Card */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-gray-500 font-medium">Active</span>
             </div>
-          )}
+            <div className="text-2xl font-bold text-gray-900">{totalListings}</div>
+            <p className="text-xs text-gray-500 mt-1">Total listings</p>
+          </div>
+
+          {/* New Today Card */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs text-gray-500 font-medium">✨ New</span>
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{newToday}</div>
+            <p className="text-xs text-gray-500 mt-1">Added today</p>
+          </div>
         </div>
       </div>
     </div>
