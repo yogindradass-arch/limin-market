@@ -5,11 +5,9 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAuthClick?: () => void;
-  darkMode: boolean;
-  setDarkMode: (value: boolean) => void;
 }
 
-export default function SettingsModal({ isOpen, onClose, onAuthClick, darkMode, setDarkMode }: SettingsModalProps) {
+export default function SettingsModal({ isOpen, onClose, onAuthClick }: SettingsModalProps) {
   const { user, signOut } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [showPhone, setShowPhone] = useState(true);
@@ -131,27 +129,6 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick, darkMode, 
                     <span
                       className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${
                         notifications ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Dark Mode Toggle */}
-                <div className="flex items-center justify-between py-3 border-b">
-                  <div>
-                    <p className="font-medium text-gray-800">Dark Mode</p>
-                    <p className="text-sm text-gray-500">Switch between light and dark theme</p>
-                  </div>
-                  <button
-                    onClick={() => setDarkMode(!darkMode)}
-                    className={`relative w-12 h-7 rounded-full transition-colors ${
-                      darkMode ? 'bg-limin-primary' : 'bg-gray-300'
-                    }`}
-                    aria-label="Toggle dark mode"
-                  >
-                    <span
-                      className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${
-                        darkMode ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />
                   </button>

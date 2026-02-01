@@ -5,21 +5,11 @@
   --color-limin-secondary: #00B48D;
   --color-limin-accent: #FFC72C;
   --color-limin-dark: #2D2D2D;
-
-  /* Dark mode colors */
-  --color-dark-bg: #1a1a1a;
-  --color-dark-surface: #2d2d2d;
-  --color-dark-border: #404040;
-  --color-dark-text: #e5e5e5;
 }
 
-/* Global dark mode styles */
+/* Global styles */
 body {
   @apply bg-gray-50 text-gray-900 transition-colors duration-200;
-}
-
-.dark body {
-  @apply bg-dark-bg text-dark-text;
 }
 
 @layer utilities {
