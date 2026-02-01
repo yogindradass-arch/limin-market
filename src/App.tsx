@@ -1583,11 +1583,19 @@ export default function App() {
       <SideMenu
         isOpen={showMenu}
         onClose={() => setShowMenu(false)}
-        onHomeClick={() => {
+        onMyListingsClick={() => {
+          setShowMenu(false);
+          setActiveTab('account');
+        }}
+        onDealsClick={() => {
           setShowMenu(false);
           setActiveTab('home');
-          setSelectedCategory(null);
-          setActiveFilter('All');
+          setActiveFilter('Deals');
+        }}
+        onFreeItemsClick={() => {
+          setShowMenu(false);
+          setActiveTab('home');
+          setActiveFilter('Free');
         }}
         onFavoritesClick={() => {
           setShowMenu(false);
