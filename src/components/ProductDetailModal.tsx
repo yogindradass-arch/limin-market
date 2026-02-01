@@ -619,7 +619,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                     {/* Contact Seller Button - Primary action for messaging */}
                     {user && onContactSeller && product.sellerId && (
                       <button
-                        onClick={() => onContactSeller(product.id, product.sellerId)}
+                        onClick={() => onContactSeller(product.id, product.sellerId!)}
                         className="w-full bg-blue-500 text-white py-4 rounded-xl font-semibold hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
