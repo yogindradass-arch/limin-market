@@ -8,6 +8,24 @@ interface TrendingSectionProps {
 export default function TrendingSection({ products, onProductClick }: TrendingSectionProps) {
   if (products.length === 0) return null;
 
+  // Get category-specific icon for listings without images
+  const getCategoryIcon = (category?: string) => {
+    switch (category) {
+      case 'Services':
+        return '🤝';
+      case 'Real Estate':
+        return '🏠';
+      case 'Vehicles':
+        return '🚗';
+      case 'Jobs':
+        return '💼';
+      case 'Electronics':
+        return '📱';
+      default:
+        return '📦';
+    }
+  };
+
   return (
     <div className="px-4 py-6 bg-gradient-to-b from-gray-50 to-white">
       <div className="flex items-center justify-between mb-4">
@@ -53,7 +71,7 @@ export default function TrendingSection({ products, onProductClick }: TrendingSe
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-limin-primary/10 to-limin-secondary/10">
-                  <span className="text-4xl">📦</span>
+                  <span className="text-4xl">{getCategoryIcon(product.category)}</span>
                 </div>
               )}
             </div>
