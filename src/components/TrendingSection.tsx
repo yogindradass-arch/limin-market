@@ -62,7 +62,10 @@ export default function TrendingSection({ products, onProductClick }: TrendingSe
 
             {/* Image */}
             <div className="relative aspect-square bg-gray-100 overflow-hidden">
-              {product.image && product.image !== 'null' && product.image !== '' ? (
+              {product.image &&
+               product.image !== 'null' &&
+               product.image !== '' &&
+               !product.image.includes('unsplash.com') ? (
                 <img
                   src={product.imageVariants?.thumb || product.image}
                   alt={product.title}
