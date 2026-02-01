@@ -583,7 +583,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                 </div>
 
                 {/* Reviews List */}
-                {showReviewsList && (
+                {showReviewsList && product.sellerId && (
                   <div className="mt-4 pt-4 border-t">
                     <ReviewsList key={reviewsKey} sellerId={product.sellerId} limit={5} showPagination={false} />
                   </div>
@@ -617,7 +617,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                 {!isOwner && (
                   <div className="space-y-3">
                     {/* Contact Seller Button - Primary action for messaging */}
-                    {user && onContactSeller && (
+                    {user && onContactSeller && product.sellerId && (
                       <button
                         onClick={() => onContactSeller(product.id, product.sellerId)}
                         className="w-full bg-blue-500 text-white py-4 rounded-xl font-semibold hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
@@ -790,7 +790,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
       </div>
 
       {/* Review Submission Modal */}
-      {showReviewModal && (
+      {showReviewModal && product.sellerId && (
         <ReviewSubmissionModal
           isOpen={showReviewModal}
           onClose={() => setShowReviewModal(false)}
