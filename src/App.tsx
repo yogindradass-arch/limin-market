@@ -883,7 +883,12 @@ export default function App() {
               </h2>
             </div>
             {(() => {
-              const recentProducts = getFilteredProducts(allProducts).slice(0, 10);
+              // Only apply filters if user has explicitly set any filters
+              const hasActiveFilters = showFreeOnly || activeFilter !== 'All' || selectedCategory !== null;
+              const recentProducts = hasActiveFilters
+                ? getFilteredProducts(allProducts).slice(0, 10)
+                : allProducts.slice(0, 10);
+
               return recentProducts.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3">
                   {recentProducts.map(p => (
