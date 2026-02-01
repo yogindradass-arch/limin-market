@@ -34,35 +34,53 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
               <h3 className="text-lg font-bold text-limin-dark mb-3">What is Limin Market?</h3>
               <p className="text-gray-700 leading-relaxed">
                 Limin Market is Guyana's homegrown online marketplace where you can buy, sell, and trade
-                anything from electronics to furniture, vehicles to clothing. Built by Guyanese, for Guyanese.
+                anything from electronics to furniture, vehicles to real estate, jobs to services.
+                With in-app messaging, seller ratings, advanced search, and analytics, we're bringing
+                modern e-commerce features to Guyana. Built by Guyanese, for Guyanese.
               </p>
             </section>
 
             <section>
-              <h3 className="text-lg font-bold text-limin-dark mb-3">How it Works</h3>
+              <h3 className="text-lg font-bold text-limin-dark mb-3">Key Features</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-limin-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-limin-primary font-bold">1</span>
+                    <span className="text-limin-primary font-bold">💬</span>
                   </div>
                   <div>
-                    <p className="text-gray-700"><strong>Browse listings</strong> from across Guyana</p>
+                    <p className="text-gray-700"><strong>In-App Messaging</strong> - Chat directly with buyers and sellers</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-limin-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-limin-primary font-bold">2</span>
+                    <span className="text-limin-primary font-bold">⭐</span>
                   </div>
                   <div>
-                    <p className="text-gray-700"><strong>Call sellers directly</strong> - no messaging hassle</p>
+                    <p className="text-gray-700"><strong>Reviews & Ratings</strong> - Rate sellers and build trust</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-limin-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-limin-primary font-bold">3</span>
+                    <span className="text-limin-primary font-bold">🔍</span>
                   </div>
                   <div>
-                    <p className="text-gray-700"><strong>Meet up & trade</strong> - simple and straightforward</p>
+                    <p className="text-gray-700"><strong>Advanced Search</strong> - Filter by category, price, location & more</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-limin-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-limin-primary font-bold">📊</span>
+                  </div>
+                  <div>
+                    <p className="text-gray-700"><strong>Seller Analytics</strong> - Track views, favorites & engagement</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-limin-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-limin-primary font-bold">🔥</span>
+                  </div>
+                  <div>
+                    <p className="text-gray-700"><strong>Trending & Deals</strong> - Discover hot items and featured listings</p>
                   </div>
                 </div>
               </div>
