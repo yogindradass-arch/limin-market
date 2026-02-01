@@ -140,10 +140,10 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
             product.price === 0 ? (
               <span className="text-purple-600">Budget: Negotiable</span>
             ) : (
-              <span className="text-purple-600">Budget: ${product.price.toFixed(2)} GYD</span>
+              <span className="text-purple-600">Budget: ${product.price.toFixed(2)} <span className="text-xs opacity-70">GYD</span></span>
             )
           ) : (
-            product.price === 0 ? 'FREE' : `$${product.price.toFixed(2)} GYD`
+            product.price === 0 ? 'FREE' : <>${product.price.toFixed(2)} <span className="text-xs opacity-70">GYD</span></>
           )}
         </p>
 
@@ -182,7 +182,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
             {(product.jobType || product.experienceLevel) && (product.salaryMin || product.salaryMax) && <span>•</span>}
             {(product.salaryMin || product.salaryMax) && (
               <span className="whitespace-nowrap">
-                ${product.salaryMin?.toLocaleString() || '0'}-${product.salaryMax?.toLocaleString() || '0'} GYD
+                ${product.salaryMin?.toLocaleString() || '0'}-${product.salaryMax?.toLocaleString() || '0'} <span className="text-[10px] opacity-70">GYD</span>
               </span>
             )}
           </div>
@@ -193,7 +193,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
             {product.serviceType && <span>{product.serviceType}</span>}
             {product.serviceType && product.priceType && <span>•</span>}
             {product.priceType && product.hourlyRate && (
-              <span className="whitespace-nowrap">${product.hourlyRate} GYD/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
+              <span className="whitespace-nowrap">${product.hourlyRate} <span className="text-[10px] opacity-70">GYD</span>/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
             )}
             {(product.serviceType || product.priceType) && product.responseTime && <span>•</span>}
             {product.responseTime && <span>{product.responseTime}</span>}
