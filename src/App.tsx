@@ -26,6 +26,7 @@ import NotificationPreferencesModal from './components/NotificationPreferencesMo
 import AdminModerationDashboard from './components/AdminModerationDashboard';
 import HeroSection from './components/HeroSection';
 import TrendingSection from './components/TrendingSection';
+import CategoryViewModal from './components/CategoryViewModal';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -73,6 +74,10 @@ export default function App() {
   // Admin state
   const [userRole, setUserRole] = useState<'user' | 'admin'>('user');
   const [pendingReportsCount, setPendingReportsCount] = useState(0);
+
+  // Category view state
+  const [showCategoryView, setShowCategoryView] = useState(false);
+  const [currentViewCategory, setCurrentViewCategory] = useState<string>('');
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -1344,8 +1349,8 @@ export default function App() {
                 <div className="grid grid-cols-3 gap-3">
                   <button
                     onClick={() => {
-                      setSelectedCategory('Jobs');
-                      setActiveFilter('All');
+                      setCurrentViewCategory('Jobs');
+                      setShowCategoryView(true);
                     }}
                     className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all active:scale-95"
                   >
@@ -1356,8 +1361,8 @@ export default function App() {
 
                   <button
                     onClick={() => {
-                      setSelectedCategory('Vehicles');
-                      setActiveFilter('All');
+                      setCurrentViewCategory('Vehicles');
+                      setShowCategoryView(true);
                     }}
                     className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all active:scale-95"
                   >
@@ -1368,8 +1373,8 @@ export default function App() {
 
                   <button
                     onClick={() => {
-                      setSelectedCategory('Services');
-                      setActiveFilter('All');
+                      setCurrentViewCategory('Services');
+                      setShowCategoryView(true);
                     }}
                     className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all active:scale-95"
                   >
@@ -1736,6 +1741,16 @@ export default function App() {
           userId={user.id}
         />
       )}
+
+      {/* Category View Modal */}
+      <CategoryViewModal
+        isOpen={showCategoryView}
+        onClose={() => setShowCategoryView(false)}
+        category={currentViewCategory}
+        products={products}
+        onProductClick={handleProductClick}
+        onFavoriteToggle={toggleFav}
+      />
     </div>
   );
 }
