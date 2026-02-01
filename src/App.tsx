@@ -755,11 +755,16 @@ export default function App() {
 
   // Filter products based on active filter and category
   const getFilteredProducts = (products: Product[]) => {
+    console.log('🎯 START getFilteredProducts:', products.length, 'products');
+    console.log('🎯 Products:', products.map(p => ({ title: p.title, category: p.category })));
+    console.log('🎯 activeFilter:', activeFilter, 'selectedCategory:', selectedCategory);
     let filtered = products;
 
     // Apply category filter first
     if (selectedCategory) {
+      console.log('🔍 Applying selectedCategory filter:', selectedCategory);
       filtered = filtered.filter(p => p.category === selectedCategory);
+      console.log('📦 After selectedCategory:', filtered.length);
     }
 
     // Apply active filter
@@ -774,6 +779,7 @@ export default function App() {
       filtered = filtered.filter(p => showFreeOnly ? (p.price >= 0 && p.price < 50) : (p.price > 0 && p.price < 50));
     }
     if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
+    console.log('📦 After activeFilter:', filtered.length);
 
     // Apply advanced filters
     if (advancedFilters.categories.length > 0) {
@@ -1178,9 +1184,9 @@ export default function App() {
             </div>
             {(() => {
               // Only apply filters if user has explicitly set any filters
-              const hasActiveFilters = showFreeOnly || activeFilter !== 'All' || selectedCategory !== null;
+              const hasActiveFilters = showFreeOnly || activeFilter !== 'All' || selectedCategory !== null || advancedFilters.categories.length > 0 || advancedFilters.priceMin !== undefined || advancedFilters.priceMax !== undefined || advancedFilters.location || advancedFilters.listingType || advancedFilters.listingMode;
               const recentProducts = hasActiveFilters
-                ? getFilteredProducts(allProducts).slice(0, 10)
+                ? getFilteredProducts(allProducts)
                 : allProducts.slice(0, 10);
 
               return recentProducts.length > 0 ? (
@@ -1203,65 +1209,72 @@ export default function App() {
           </section>
         </div>
 
-        {filteredHotDeals.length > 0 && (
-          <HotDealsSection deals={filteredHotDeals} onDealClick={handleProductClick} />
+        {/* Only show price-based sections when no advanced filters are active */}
+        {!(advancedFilters.categories.length > 0 || advancedFilters.priceMin !== undefined || advancedFilters.priceMax !== undefined || advancedFilters.location || advancedFilters.listingType || advancedFilters.listingMode) && (
+          <>
+            {filteredHotDeals.length > 0 && (
+              <HotDealsSection deals={filteredHotDeals} onDealClick={handleProductClick} />
+            )}
+
+            <div className="px-4 py-6 space-y-6">
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-limin-dark flex items-center">
+                    <span className="text-2xl mr-2">💰</span>Dollar Express
+                  </h2>
+                  {filteredDollarItems.length > 0 && (
+                    <button className="text-sm text-limin-primary font-medium">See All →</button>
+                  )}
+                </div>
+                {filteredDollarItems.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-3">
+                    {filteredDollarItems.map(p => (
+                      <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl p-6 text-center">
+                    <div className="text-4xl mb-3">💸</div>
+                    <p className="text-sm text-gray-600">
+                      {allProducts.length > 0 && activeFilter !== 'All'
+                        ? `No items under $50 match the "${activeFilter}" filter.`
+                        : "No affordable items yet. Post budget-friendly deals!"}
+                    </p>
+                  </div>
+                )}
+              </section>
+
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-limin-dark flex items-center">
+                    <span className="text-2xl mr-2">🎁</span>Free Items
+                  </h2>
+                  {filteredFreeItems.length > 0 && (
+                    <button className="text-sm text-limin-primary font-medium">See All →</button>
+                  )}
+                </div>
+                {filteredFreeItems.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-3">
+                    {filteredFreeItems.map(p => (
+                      <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl p-6 text-center">
+                    <div className="text-4xl mb-3">🎁</div>
+                    <p className="text-sm text-gray-600">
+                      {allProducts.length > 0 && activeFilter !== 'All'
+                        ? `No free items match the "${activeFilter}" filter.`
+                        : "No free items yet. Share things you want to give away!"}
+                    </p>
+                  </div>
+                )}
+              </section>
+            </div>
+          </>
         )}
 
-        <div className="px-4 py-6 space-y-6">
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-limin-dark flex items-center">
-                <span className="text-2xl mr-2">💰</span>Dollar Express
-              </h2>
-              {filteredDollarItems.length > 0 && (
-                <button className="text-sm text-limin-primary font-medium">See All →</button>
-              )}
-            </div>
-            {filteredDollarItems.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3">
-                {filteredDollarItems.map(p => (
-                  <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl p-6 text-center">
-                <div className="text-4xl mb-3">💸</div>
-                <p className="text-sm text-gray-600">
-                  {allProducts.length > 0 && activeFilter !== 'All'
-                    ? `No items under $50 match the "${activeFilter}" filter.`
-                    : "No affordable items yet. Post budget-friendly deals!"}
-                </p>
-              </div>
-            )}
-          </section>
-
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-limin-dark flex items-center">
-                <span className="text-2xl mr-2">🎁</span>Free Items
-              </h2>
-              {filteredFreeItems.length > 0 && (
-                <button className="text-sm text-limin-primary font-medium">See All →</button>
-              )}
-            </div>
-            {filteredFreeItems.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3">
-                {filteredFreeItems.map(p => (
-                  <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl p-6 text-center">
-                <div className="text-4xl mb-3">🎁</div>
-                <p className="text-sm text-gray-600">
-                  {allProducts.length > 0 && activeFilter !== 'All'
-                    ? `No free items match the "${activeFilter}" filter.`
-                    : "No free items yet. Share things you want to give away!"}
-                </p>
-              </div>
-            )}
-          </section>
-
+        <div className="px-4 py-6">
           <section className="pt-4">
             <h2 className="text-xl font-bold text-limin-dark mb-4">Shop by Category</h2>
             <div className="grid grid-cols-3 gap-3">
