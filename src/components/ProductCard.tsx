@@ -37,7 +37,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
   const getCategoryIcon = () => {
     switch (product.category) {
       case 'Services':
-        return '🛠️';
+        return '🤝';
       case 'Real Estate':
         return '🏠';
       case 'Vehicles':

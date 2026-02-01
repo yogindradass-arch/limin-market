@@ -49,6 +49,31 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
 
   const isOwner = user && product.sellerId === user.id;
 
+  // Get category-specific icon for listings without images
+  const getCategoryIcon = () => {
+    switch (product.category) {
+      case 'Services':
+        return '🤝';
+      case 'Real Estate':
+        return '🏠';
+      case 'Vehicles':
+        return '🚗';
+      case 'Jobs':
+        return '💼';
+      case 'Electronics':
+        return '📱';
+      default:
+        return '📦';
+    }
+  };
+
+  // Check if product has a valid image
+  const currentImage = (product.images && product.images.length > 0) ? product.images[currentImageIndex] : product.image;
+  const hasImage = currentImage &&
+    currentImage !== 'null' &&
+    currentImage !== '' &&
+    !currentImage.includes('unsplash.com');
+
   const handleDelete = () => {
     if (onDelete) {
       onDelete(product.id);
@@ -134,11 +159,20 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
           <div className="max-h-[90vh] overflow-y-auto">
             {/* Image Carousel */}
             <div className="relative aspect-[4/3] bg-gray-200">
-              <img
-                src={(product.images && product.images.length > 0) ? product.images[currentImageIndex] : product.image}
-                alt={`${product.title} - Image ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover"
-              />
+              {hasImage ? (
+                <img
+                  src={currentImage}
+                  alt={`${product.title} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-limin-primary/10 to-limin-secondary/10">
+                  <div className="text-center">
+                    <div className="text-9xl mb-4">{getCategoryIcon()}</div>
+                    <div className="text-lg text-gray-600 font-medium px-4">{product.category || 'General'}</div>
+                  </div>
+                </div>
+              )}
 
               {/* Navigation Arrows - only show if multiple images */}
               {product.images && product.images.length > 1 && (
