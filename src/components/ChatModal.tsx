@@ -264,7 +264,7 @@ export default function ChatModal({ conversation, isOpen, onClose, onBack }: Cha
                   {product?.title || 'Product'}
                 </p>
                 <p className="text-sm text-limin-primary font-bold">
-                  {product?.price === 0 ? 'FREE' : `$${product?.price.toFixed(2)}`}
+                  {product?.price === 0 ? 'FREE' : product?.price ? `$${product.price.toFixed(2)}` : 'Price not available'}
                 </p>
               </div>
             </div>

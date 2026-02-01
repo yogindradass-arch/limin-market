@@ -34,7 +34,10 @@ export default function MessagesModal({ isOpen, onClose, onConversationClick }: 
 
       const { data, error } = await supabase
         .from('conversations')
-        .select('*')
+        .select(`
+          *,
+          product:products(*)
+        `)
         .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
         .order('last_message_at', { ascending: false });
 
