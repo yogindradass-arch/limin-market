@@ -190,12 +190,12 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
               {/* Badges */}
               <div className="absolute bottom-4 left-4 flex gap-2">
                 {product.listingType === 'wholesale' && (
-                  <span className="px-2 py-1 bg-limin-secondary text-white text-xs font-semibold rounded">
+                  <span className="px-2 py-1 bg-limin-primary text-white text-xs font-bold rounded shadow-md">
                     WHOLESALE
                   </span>
                 )}
                 {product.listingType === 'local' && (
-                  <span className="px-2 py-1 bg-limin-accent text-limin-dark text-xs font-semibold rounded">
+                  <span className="px-2 py-1 bg-limin-secondary text-white text-xs font-bold rounded shadow-md">
                     LOCAL
                   </span>
                 )}
