@@ -4,22 +4,37 @@ interface SideMenuProps {
   onAboutClick?: () => void;
   onSettingsClick?: () => void;
   onFavoritesClick?: () => void;
-  onHomeClick?: () => void;
+  onMyListingsClick?: () => void;
+  onDealsClick?: () => void;
+  onFreeItemsClick?: () => void;
 }
 
-export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClick, onFavoritesClick, onHomeClick }: SideMenuProps) {
+export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClick, onFavoritesClick, onMyListingsClick, onDealsClick, onFreeItemsClick }: SideMenuProps) {
   if (!isOpen) return null;
 
-  const menuItems = [
-    { icon: '🏠', label: 'Home', action: () => onHomeClick?.() },
-    { icon: '🔥', label: 'Hot Deals', action: () => console.log('Hot Deals') },
-    { icon: '💰', label: 'Dollar Express', action: () => console.log('Dollar Express') },
-    { icon: '🎁', label: 'Free Items', action: () => console.log('Free Items') },
-    { icon: '📱', label: 'My Listings', action: () => console.log('My Listings') },
-    { icon: '❤️', label: 'Favorites', action: () => onFavoritesClick?.() },
-    { icon: '⚙️', label: 'Settings', action: () => onSettingsClick?.() },
-    { icon: 'ℹ️', label: 'About', action: () => onAboutClick?.() },
-    { icon: '📞', label: 'Contact Us', action: () => console.log('Contact') },
+  const menuSections = [
+    {
+      title: 'Browse',
+      items: [
+        { icon: '🔥', label: 'Deals & Featured', action: () => onDealsClick?.() },
+        { icon: '🎁', label: 'Free Items', action: () => onFreeItemsClick?.() },
+      ]
+    },
+    {
+      title: 'My Account',
+      items: [
+        { icon: '📱', label: 'My Listings', action: () => onMyListingsClick?.() },
+        { icon: '❤️', label: 'Favorites', action: () => onFavoritesClick?.() },
+      ]
+    },
+    {
+      title: 'App',
+      items: [
+        { icon: '⚙️', label: 'Settings', action: () => onSettingsClick?.() },
+        { icon: 'ℹ️', label: 'About', action: () => onAboutClick?.() },
+        { icon: '📞', label: 'Contact Us', action: () => console.log('Contact') },
+      ]
+    }
   ];
 
   return (
@@ -48,19 +63,28 @@ export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClic
 
         {/* Menu Items */}
         <div className="overflow-y-auto" style={{ height: 'calc(100vh - 140px)' }}>
-          <nav className="p-2">
-            {menuItems.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  item.action();
-                  onClose();
-                }}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-gray-800 font-medium">{item.label}</span>
-              </button>
+          <nav className="p-4">
+            {menuSections.map((section, sectionIndex) => (
+              <div key={sectionIndex} className={sectionIndex > 0 ? 'mt-6' : ''}>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-2">
+                  {section.title}
+                </h3>
+                <div className="space-y-1">
+                  {section.items.map((item, itemIndex) => (
+                    <button
+                      key={itemIndex}
+                      onClick={() => {
+                        item.action();
+                        onClose();
+                      }}
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left group"
+                    >
+                      <span className="text-2xl group-hover:scale-110 transition-transform">{item.icon}</span>
+                      <span className="text-gray-800 font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
 
