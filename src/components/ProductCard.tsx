@@ -51,7 +51,10 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
     }
   };
 
-  const hasImage = product.image && product.image !== 'null' && product.image !== '';
+  const hasImage = product.image &&
+    product.image !== 'null' &&
+    product.image !== '' &&
+    !product.image.includes('unsplash.com');
 
   return (
     <div
