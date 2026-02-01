@@ -23,6 +23,19 @@
 
     <!-- Theme Color -->
     <meta name="theme-color" content="#f97316" />
+
+    <!-- Dark Mode Initialization -->
+    <script>
+      // Initialize dark mode before page loads to prevent flash
+      (function() {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        if (darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

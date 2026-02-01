@@ -13,11 +13,28 @@ export default function SettingsModal({ isOpen, onClose, onAuthClick }: Settings
   const [darkMode, setDarkMode] = useState(() => {
     // Load dark mode preference from localStorage
     const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
+    // Default to false if no preference is saved
+    return saved === 'true' ? true : false;
   });
   const [showPhone, setShowPhone] = useState(true);
 
-  // Apply dark mode to document
+  // Initialize dark mode on mount
+  useEffect(() => {
+    const initDarkMode = () => {
+      const saved = localStorage.getItem('darkMode');
+      const isDark = saved === 'true';
+
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    initDarkMode();
+  }, []);
+
+  // Apply dark mode changes
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');

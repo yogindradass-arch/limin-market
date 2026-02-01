@@ -11,6 +11,9 @@
   --color-dark-surface: #2d2d2d;
   --color-dark-border: #404040;
   --color-dark-text: #e5e5e5;
+
+  /* Force class-based dark mode only */
+  --dark-mode: class;
 }
 
 /* Global dark mode styles */
