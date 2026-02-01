@@ -43,19 +43,17 @@ export default function BottomNav({
                   onTabChange(tab.id);
                 }
               }}
-              className="flex flex-col items-center justify-center flex-1 h-full relative transition-all duration-200 hover:bg-gray-50 rounded-lg py-1.5 gap-0.5"
+              className="flex flex-col items-center justify-center flex-1 h-full relative transition-all duration-200 hover:bg-gray-50 rounded-lg py-1.5 gap-1"
             >
-              <div className="relative">
+              <div className="relative flex items-center justify-center h-6">
                 <Icon isActive={isActive} />
-                {/* Badge for messages and admin tabs */}
+                {/* Simple dot indicator for notifications */}
                 {'badge' in tab && tab.badge && tab.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center shadow-sm">
-                    {tab.badge > 9 ? '9+' : tab.badge}
-                  </span>
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 )}
               </div>
               {isActive && (
-                <span className="text-[11px] font-semibold text-limin-primary">
+                <span className="text-[11px] font-semibold text-limin-primary leading-none">
                   {tab.label}
                 </span>
               )}
