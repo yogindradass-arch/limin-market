@@ -21,8 +21,10 @@ import MessagesModal from './components/MessagesModal';
 import ChatModal from './components/ChatModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
 import SavedSearchesList from './components/SavedSearchesList';
+import SellerAnalyticsDashboard from './components/SellerAnalyticsDashboard';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
+import { trackEvent } from './lib/analytics';
 import type { Product } from './types/product';
 import type { Conversation } from './types/messages';
 import type { SearchFilters } from './types/search';
@@ -61,6 +63,7 @@ export default function App() {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [showSavedSearches, setShowSavedSearches] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<SearchFilters>({ categories: [] });
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -301,6 +304,11 @@ export default function App() {
         const { error } = await supabase
           .from('favorites')
           .insert({ user_id: user.id, product_id: id });
+
+        if (!error) {
+          // Track favorite event
+          trackEvent('favorite', id, user.id);
+        }
 
         if (error) throw error;
       }
@@ -744,6 +752,9 @@ export default function App() {
       });
       setShowChat(true);
       closeModal(); // Close product detail modal
+
+      // Track contact event
+      trackEvent('contact', productId, user.id);
     } catch (error) {
       console.error('Error handling contact seller:', error);
       alert('Failed to contact seller. Please try again.');
@@ -953,6 +964,15 @@ export default function App() {
                   className="py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
                 >
                   Post Listing
+                </button>
+                <button
+                  onClick={() => setShowAnalytics(true)}
+                  className="py-3 bg-limin-secondary text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Analytics
                 </button>
                 <button
                   onClick={() => setShowSettings(true)}
@@ -1488,6 +1508,15 @@ export default function App() {
         onClose={() => setShowSettings(false)}
         onAuthClick={() => setShowAuth(true)}
       />
+
+      {/* Analytics Dashboard */}
+      {showAnalytics && user && (
+        <SellerAnalyticsDashboard
+          onClose={() => setShowAnalytics(false)}
+          sellerId={user.id}
+          sellerName={user.email?.split('@')[0] || 'User'}
+        />
+      )}
 
       <UpdatePasswordModal
         isOpen={showResetPassword}
