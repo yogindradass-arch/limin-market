@@ -24,6 +24,9 @@ import SavedSearchesList from './components/SavedSearchesList';
 import SellerAnalyticsDashboard from './components/SellerAnalyticsDashboard';
 import NotificationPreferencesModal from './components/NotificationPreferencesModal';
 import AdminModerationDashboard from './components/AdminModerationDashboard';
+import HeroSection from './components/HeroSection';
+import CategoryGrid from './components/CategoryGrid';
+import TrendingSection from './components/TrendingSection';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -1243,8 +1246,64 @@ export default function App() {
       );
     }
 
+    // Calculate category counts and trending items
+    const categories = [
+      { id: 'real-estate', name: 'Real Estate', icon: '🏠', count: allProducts.filter(p => p.category === 'Real Estate').length, gradient: 'from-blue-500 to-blue-600' },
+      { id: 'vehicles', name: 'Vehicles', icon: '🚗', count: allProducts.filter(p => p.category === 'Vehicles').length, gradient: 'from-purple-500 to-purple-600' },
+      { id: 'jobs', name: 'Jobs', icon: '💼', count: allProducts.filter(p => p.category === 'Jobs').length, gradient: 'from-green-500 to-green-600' },
+      { id: 'services', name: 'Services', icon: '🛠️', count: allProducts.filter(p => p.category === 'Services').length, gradient: 'from-orange-500 to-orange-600' },
+      { id: 'electronics', name: 'Electronics', icon: '📱', count: allProducts.filter(p => p.category === 'Electronics').length, gradient: 'from-indigo-500 to-indigo-600' },
+      { id: 'fashion', name: 'Fashion', icon: '👕', count: allProducts.filter(p => p.category === 'Fashion').length, gradient: 'from-pink-500 to-pink-600' },
+      { id: 'home', name: 'Home & Garden', icon: '🌺', count: allProducts.filter(p => p.category === 'Home & Garden').length, gradient: 'from-teal-500 to-teal-600' },
+      { id: 'sports', name: 'Sports', icon: '⚽', count: allProducts.filter(p => p.category === 'Sports & Outdoors').length, gradient: 'from-red-500 to-red-600' },
+      { id: 'books', name: 'Books', icon: '📚', count: allProducts.filter(p => p.category === 'Books & Media').length, gradient: 'from-yellow-500 to-yellow-600' },
+    ];
+
+    // Get trending products (most viewed)
+    const trendingProducts = [...allProducts]
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, 10);
+
+    // Count new listings today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const newToday = allProducts.filter(p => {
+      const createdAt = new Date(p.createdAt || 0);
+      return createdAt >= today;
+    }).length;
+
     return (
       <>
+        {/* Hero Section */}
+        {!selectedCategory && (
+          <HeroSection
+            totalListings={allProducts.length}
+            newToday={newToday}
+            location={currentLocation}
+            onPostClick={() => setShowPostForm(true)}
+            onSearchClick={() => setShowSearch(true)}
+          />
+        )}
+
+        {/* Category Grid */}
+        {!selectedCategory && (
+          <CategoryGrid
+            categories={categories}
+            onCategoryClick={(categoryName) => {
+              setSelectedCategory(categoryName);
+              setActiveTab('home');
+            }}
+          />
+        )}
+
+        {/* Trending Section */}
+        {!selectedCategory && trendingProducts.length > 0 && (
+          <TrendingSection
+            products={trendingProducts}
+            onProductClick={handleProductClick}
+          />
+        )}
+
         {/* Category Filter Banner */}
         {selectedCategory && (
           <div className="mx-4 mt-4 bg-limin-primary/10 border-2 border-limin-primary rounded-lg p-3 flex items-center justify-between">
