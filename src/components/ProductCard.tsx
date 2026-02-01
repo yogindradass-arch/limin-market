@@ -135,7 +135,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
       {/* Content Section */}
       <div className="p-3">
         {/* Price */}
-        <p className="text-lg font-bold text-limin-dark dark:text-dark-text mb-1">
+        <p className="text-lg font-bold text-limin-dark dark:text-dark-text mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
           {product.listingMode === 'seeking' ? (
             product.price === 0 ? (
               <span className="text-purple-600">Budget: Negotiable</span>

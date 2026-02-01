@@ -85,7 +85,7 @@ export default function TrendingSection({ products, onProductClick }: TrendingSe
                 {product.title}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-limin-primary">
+                <span className="text-sm font-bold text-limin-primary whitespace-nowrap">
                   {product.price === 0 ? 'FREE' : `$${product.price.toLocaleString()} GYD`}
                 </span>
                 <div className="flex items-center gap-1 text-[10px] text-gray-500">
