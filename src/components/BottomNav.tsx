@@ -2,9 +2,10 @@ interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onSearchClick?: () => void;
+  unreadMessagesCount?: number;
 }
 
-export default function BottomNav({ activeTab, onTabChange, onSearchClick }: BottomNavProps) {
+export default function BottomNav({ activeTab, onTabChange, onSearchClick, unreadMessagesCount = 0 }: BottomNavProps) {
   const tabs = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'search', label: 'Search', icon: SearchIcon },
@@ -30,9 +31,17 @@ export default function BottomNav({ activeTab, onTabChange, onSearchClick }: Bot
                   onTabChange(tab.id);
                 }
               }}
-              className="flex flex-col items-center justify-center flex-1 h-full"
+              className="flex flex-col items-center justify-center flex-1 h-full relative"
             >
-              <Icon isActive={isActive} />
+              <div className="relative">
+                <Icon isActive={isActive} />
+                {/* Unread badge for messages tab */}
+                {tab.id === 'messages' && unreadMessagesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                  </span>
+                )}
+              </div>
               <span
                 className={`text-xs mt-1 ${
                   isActive ? 'text-limin-primary font-medium' : 'text-gray-600'

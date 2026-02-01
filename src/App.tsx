@@ -17,9 +17,12 @@ import EmptyState from './components/EmptyState';
 import AboutModal from './components/AboutModal';
 import SettingsModal from './components/SettingsModal';
 import UpdatePasswordModal from './components/UpdatePasswordModal';
+import MessagesModal from './components/MessagesModal';
+import ChatModal from './components/ChatModal';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import type { Product } from './types/product';
+import type { Conversation } from './types/messages';
 
 export default function App() {
   const { user } = useAuth();
@@ -40,6 +43,11 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('Georgetown');
+
+  // Messaging state
+  const [showChat, setShowChat] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [totalUnreadCount, setTotalUnreadCount] = useState(0);
 
   // Sort and Filter state
   const [sortBy, setSortBy] = useState('newest');
@@ -71,6 +79,37 @@ export default function App() {
   // Fetch favorites when user changes
   useEffect(() => {
     fetchFavorites();
+  }, [user]);
+
+  // Subscribe to unread messages count
+  useEffect(() => {
+    if (!user) {
+      setTotalUnreadCount(0);
+      return;
+    }
+
+    fetchUnreadCount();
+
+    // Subscribe to conversation changes for real-time unread count
+    const channel = supabase
+      .channel('conversations_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+          filter: `buyer_id=eq.${user.id},seller_id=eq.${user.id}`
+        },
+        () => {
+          fetchUnreadCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const fetchProducts = async () => {
@@ -194,6 +233,33 @@ export default function App() {
       setFavorites(new Set(data.map(f => f.product_id)));
     } catch (error) {
       console.error('Error fetching favorites:', error);
+    }
+  };
+
+  // Fetch unread messages count
+  const fetchUnreadCount = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('buyer_id, seller_id, buyer_unread_count, seller_unread_count')
+        .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`);
+
+      if (error) {
+        console.error('Error fetching unread count:', error);
+        return;
+      }
+
+      if (data) {
+        const total = data.reduce((sum, conv) => {
+          const unread = conv.buyer_id === user.id ? conv.buyer_unread_count : conv.seller_unread_count;
+          return sum + unread;
+        }, 0);
+        setTotalUnreadCount(total);
+      }
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
     }
   };
 
@@ -609,6 +675,70 @@ export default function App() {
     } catch (error) {
       console.error('Error extending listing:', error);
       alert('Failed to extend listing. Please try again.');
+    }
+  };
+
+  const handleContactSeller = async (productId: string, sellerId: string) => {
+    if (!user) {
+      alert('Please sign in to contact the seller');
+      setShowAuth(true);
+      return;
+    }
+
+    try {
+      // Check if conversation already exists
+      const { data: existingConv, error: searchError } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('product_id', productId)
+        .eq('buyer_id', user.id)
+        .eq('seller_id', sellerId)
+        .single();
+
+      if (searchError && searchError.code !== 'PGRST116') {
+        console.error('Error searching conversation:', searchError);
+        alert('Failed to open chat. Please try again.');
+        return;
+      }
+
+      let conversation = existingConv;
+
+      // Create new conversation if it doesn't exist
+      if (!existingConv) {
+        const { data: newConv, error: createError } = await supabase
+          .from('conversations')
+          .insert({
+            product_id: productId,
+            buyer_id: user.id,
+            seller_id: sellerId
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating conversation:', createError);
+          alert('Failed to start conversation. Please try again.');
+          return;
+        }
+
+        conversation = newConv;
+      }
+
+      // Get product details
+      const product = products.find(p => p.id === productId);
+
+      // Set conversation with product data and open chat
+      setSelectedConversation({
+        ...conversation,
+        product,
+        other_user_name: product?.seller || 'Seller',
+        other_user_id: sellerId
+      });
+      setShowChat(true);
+      closeModal(); // Close product detail modal
+    } catch (error) {
+      console.error('Error handling contact seller:', error);
+      alert('Failed to contact seller. Please try again.');
     }
   };
 
@@ -1096,6 +1226,7 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onSearchClick={() => setShowSearch(true)}
+        unreadMessagesCount={totalUnreadCount}
       />
       <FAB onClick={() => setShowPostForm(true)} />
 
@@ -1111,6 +1242,7 @@ export default function App() {
           onMarkAsSold={handleMarkAsSold}
           onExtendListing={handleExtendListing}
           onViewSellerProfile={handleViewSellerProfile}
+          onContactSeller={handleContactSeller}
         />
       )}
 
@@ -1250,6 +1382,31 @@ export default function App() {
       <UpdatePasswordModal
         isOpen={showResetPassword}
         onClose={() => setShowResetPassword(false)}
+      />
+
+      {/* Messaging Components */}
+      <MessagesModal
+        isOpen={activeTab === 'messages'}
+        onClose={() => setActiveTab('home')}
+        onConversationClick={(conversation) => {
+          setSelectedConversation(conversation);
+          setShowChat(true);
+        }}
+      />
+
+      <ChatModal
+        conversation={selectedConversation}
+        isOpen={showChat}
+        onClose={() => {
+          setShowChat(false);
+          setSelectedConversation(null);
+          fetchUnreadCount(); // Refresh unread count when closing chat
+        }}
+        onBack={() => {
+          setShowChat(false);
+          setSelectedConversation(null);
+          setActiveTab('messages'); // Go back to messages list
+        }}
       />
     </div>
   );

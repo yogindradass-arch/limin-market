@@ -1,3 +1,5 @@
+import type { SellerRating } from './review';
+
 export interface Product {
   id: string;
   title: string;
@@ -19,6 +21,9 @@ export interface Product {
   expiresAt?: string;
   createdAt?: string;
   views?: number;
+  // Seller rating data
+  sellerRating?: SellerRating;
+  reviewCount?: number;
   // Real Estate fields
   bedrooms?: number;
   bathrooms?: number;

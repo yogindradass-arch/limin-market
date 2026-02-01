@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import type { Product } from '../types/product';
+import type { SellerRating } from '../types/review';
 import { useAuth } from '../context/AuthContext';
 import ShareButton from './ShareButton';
+import ReviewSubmissionModal from './ReviewSubmissionModal';
+import ReviewsList from './ReviewsList';
 import { supabase } from '../lib/supabase';
 
 interface ProductDetailModalProps {
@@ -15,14 +18,19 @@ interface ProductDetailModalProps {
   onMarkAsSold?: (productId: string) => void;
   onExtendListing?: (productId: string) => void;
   onViewSellerProfile?: (sellerId: string, sellerName: string) => void;
+  onContactSeller?: (productId: string, sellerId: string) => void;
 }
 
-export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit, onReport, onMarkAsSold, onExtendListing, onViewSellerProfile }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, isOpen, onClose, onFavoriteToggle, onDelete, onEdit, onReport, onMarkAsSold, onExtendListing, onViewSellerProfile, onContactSeller }: ProductDetailModalProps) {
   const { user } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showReviewsList, setShowReviewsList] = useState(false);
+  const [sellerRating, setSellerRating] = useState<SellerRating | null>(null);
+  const [reviewsKey, setReviewsKey] = useState(0);
 
   // Track view when modal opens
   useEffect(() => {
@@ -42,8 +50,35 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
       };
 
       incrementViews();
+      fetchSellerRating();
     }
   }, [isOpen, product?.id]);
+
+  const fetchSellerRating = async () => {
+    if (!product) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('seller_ratings')
+        .select('*')
+        .eq('seller_id', product.sellerId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching seller rating:', error);
+        return;
+      }
+
+      setSellerRating(data || null);
+    } catch (error) {
+      console.error('Error fetching seller rating:', error);
+    }
+  };
+
+  const handleReviewSubmitted = () => {
+    fetchSellerRating();
+    setReviewsKey(prev => prev + 1); // Force refresh of reviews list
+  };
 
   if (!isOpen || !product) return null;
 
@@ -478,12 +513,25 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
 
               {/* Seller Info */}
               <div className="border-t pt-5 mt-5">
-                <h3 className="text-lg font-semibold text-limin-dark mb-4">Seller Information</h3>
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-limin-primary to-orange-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-limin-dark">Seller Information</h3>
+                  {!isOwner && user && (
+                    <button
+                      onClick={() => setShowReviewModal(true)}
+                      className="text-sm text-limin-primary font-semibold hover:text-limin-primary/80 flex items-center gap-1"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                      Leave Review
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-limin-primary to-orange-600 flex items-center justify-center text-white font-bold text-xl shadow-md shrink-0">
                     {product.seller.charAt(0).toUpperCase()}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <button
                       onClick={() => {
                         if (onViewSellerProfile && product.sellerId) {
@@ -497,14 +545,49 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
-                    <div className="text-sm text-gray-600 flex items-center gap-1">
-                      <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Verified Seller</span>
-                    </div>
+
+                    {/* Seller Rating */}
+                    {sellerRating && sellerRating.review_count > 0 ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center">
+                          {Array.from({ length: 5 }, (_, i) => (
+                            <svg
+                              key={i}
+                              className={`w-4 h-4 ${i < Math.round(sellerRating.average_rating) ? 'text-limin-primary' : 'text-gray-300'}`}
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="text-sm font-medium text-gray-700">
+                          {sellerRating.average_rating.toFixed(1)} ({sellerRating.review_count} {sellerRating.review_count === 1 ? 'review' : 'reviews'})
+                        </span>
+                        <button
+                          onClick={() => setShowReviewsList(!showReviewsList)}
+                          className="text-sm text-limin-primary hover:text-limin-primary/80 font-medium"
+                        >
+                          {showReviewsList ? 'Hide' : 'View'} Reviews
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>Verified Seller • No reviews yet</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* Reviews List */}
+                {showReviewsList && (
+                  <div className="mt-4 pt-4 border-t">
+                    <ReviewsList key={reviewsKey} sellerId={product.sellerId} limit={5} showPagination={false} />
+                  </div>
+                )}
               </div>
 
               {/* Expiration Warning - only show to owner if expiring soon */}
@@ -533,6 +616,20 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                 {/* Contact Button - only show if not owner */}
                 {!isOwner && (
                   <div className="space-y-3">
+                    {/* Contact Seller Button - Primary action for messaging */}
+                    {user && onContactSeller && (
+                      <button
+                        onClick={() => onContactSeller(product.id, product.sellerId)}
+                        className="w-full bg-blue-500 text-white py-4 rounded-xl font-semibold hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Contact Seller
+                      </button>
+                    )}
+
+                    {/* Alternative Contact Methods */}
                     <div className="grid grid-cols-2 gap-3">
                       {/* Call Button */}
                       <a
@@ -691,6 +788,18 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
           </div>
         </div>
       </div>
+
+      {/* Review Submission Modal */}
+      {showReviewModal && (
+        <ReviewSubmissionModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          sellerId={product.sellerId}
+          sellerName={product.seller}
+          productId={product.id}
+          onReviewSubmitted={handleReviewSubmitted}
+        />
+      )}
     </div>
   );
 }
