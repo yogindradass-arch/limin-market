@@ -1,4 +1,4 @@
-import { Product } from '../types/product';
+import type { Product } from '../types/product';
 
 interface TrendingSectionProps {
   products: Product[];
