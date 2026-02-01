@@ -4,11 +4,9 @@ interface HeroSectionProps {
   totalListings: number;
   newToday: number;
   location: string;
-  onPostClick: () => void;
-  onSearchClick: () => void;
 }
 
-export default function HeroSection({ totalListings, newToday, location, onPostClick, onSearchClick }: HeroSectionProps) {
+export default function HeroSection({ totalListings, newToday, location }: HeroSectionProps) {
   const [greeting, setGreeting] = useState('');
   const [emoji, setEmoji] = useState('');
 

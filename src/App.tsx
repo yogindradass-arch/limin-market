@@ -1266,8 +1266,6 @@ export default function App() {
             totalListings={allProducts.length}
             newToday={newToday}
             location={currentLocation}
-            onPostClick={() => setShowPostForm(true)}
-            onSearchClick={() => setShowSearch(true)}
           />
         )}
 
