@@ -167,7 +167,7 @@ export default function AdminModerationDashboard({
     }
   };
 
-  const handleBanUser = async (reportId: string, userId: string, productTitle: string) => {
+  const handleBanUser = async (reportId: string, userId: string, _productTitle: string) => {
     const duration = prompt(
       'Ban duration:\n' +
       '1 = 7 days\n' +
