@@ -51,15 +51,37 @@ export default function MessagesModal({ isOpen, onClose, onConversationClick }: 
 
       if (data) {
         console.log('[Messages] Processing', data.length, 'conversations');
-        // Simplified - no product fetch, no profile fetch
-        const enhancedConversations = data.map((conv) => {
-          const otherUserId = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
-          return {
-            ...conv,
-            other_user_name: 'User',
-            other_user_id: otherUserId
-          };
+
+        // Filter out empty conversations (no messages sent yet)
+        const conversationsWithMessages = data.filter((conv) => {
+          // Check if there are any unread messages or if last_message_at is different from created_at
+          const hasMessages = conv.buyer_unread_count > 0 ||
+                            conv.seller_unread_count > 0 ||
+                            conv.last_message_at !== conv.created_at;
+          return hasMessages;
         });
+
+        console.log('[Messages] Filtered to', conversationsWithMessages.length, 'conversations with messages');
+
+        // Fetch other user's name for each conversation
+        const enhancedConversations = await Promise.all(
+          conversationsWithMessages.map(async (conv) => {
+            const otherUserId = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
+
+            // Fetch the other user's profile
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', otherUserId)
+              .single();
+
+            return {
+              ...conv,
+              other_user_name: profile?.full_name || 'User',
+              other_user_id: otherUserId
+            };
+          })
+        );
 
         setConversations(enhancedConversations);
         console.log('[Messages] Set conversations successfully');
