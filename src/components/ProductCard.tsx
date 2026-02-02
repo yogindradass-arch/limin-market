@@ -64,7 +64,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle,
   return (
     <div
       onClick={handleClick}
-      className="bg-white dark:bg-dark-surface rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative border border-transparent dark:border-dark-border"
+      className="bg-white dark:bg-dark-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative border border-transparent dark:border-dark-border"
     >
       {/* Image Section */}
       <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
