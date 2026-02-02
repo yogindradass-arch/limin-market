@@ -57,4 +57,9 @@ export interface Product {
   deliveryOption?: 'pickup' | 'delivery' | 'both';  // Delivery option
   deliveryFee?: number;  // Delivery fee in GYD (0 for free delivery)
   deliveryZones?: string[];  // Areas where delivery is available
+  // Home-Made fields
+  homeMadeType?: string;  // Pepper Sauce, Bread, Pastries, Chutney, etc.
+  ingredients?: string;  // List of main ingredients
+  shelfLife?: string;  // How long the item lasts
+  isRefrigerated?: boolean;  // Requires refrigeration
 }
