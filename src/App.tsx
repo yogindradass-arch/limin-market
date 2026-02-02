@@ -290,6 +290,11 @@ export default function App() {
             priceType: item.price_type,
             hourlyRate: item.hourly_rate,
             responseTime: item.response_time,
+            // Delivery fields
+            deliveryAvailable: item.delivery_available,
+            deliveryOption: item.delivery_option,
+            deliveryFee: item.delivery_fee,
+            deliveryZones: item.delivery_zones,
           };
         });
 
@@ -486,6 +491,11 @@ export default function App() {
             price_type: listingData.priceType,
             hourly_rate: listingData.hourlyRate,
             response_time: listingData.responseTime,
+            // Delivery fields
+            delivery_available: listingData.deliveryOption === 'delivery' || listingData.deliveryOption === 'both',
+            delivery_option: listingData.deliveryOption,
+            delivery_fee: listingData.deliveryFee || 0,
+            delivery_zones: listingData.deliveryZones || [],
           },
         ])
         .select();
@@ -581,6 +591,11 @@ export default function App() {
           price_type: listing.priceType,
           hourly_rate: listing.hourlyRate,
           response_time: listing.responseTime,
+          // Delivery fields
+          delivery_available: listing.deliveryOption === 'delivery' || listing.deliveryOption === 'both',
+          delivery_option: listing.deliveryOption,
+          delivery_fee: listing.deliveryFee || 0,
+          delivery_zones: listing.deliveryZones || [],
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings

@@ -200,6 +200,16 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
           </div>
         )}
 
+        {/* Delivery Badge */}
+        {(product.deliveryOption === 'delivery' || product.deliveryOption === 'both') && (
+          <div className="mb-2 flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full w-fit">
+            <span>🚚</span>
+            <span className="font-medium">
+              {product.deliveryFee === 0 ? 'Free Delivery' : `Delivery $${product.deliveryFee}`}
+            </span>
+          </div>
+        )}
+
         {/* Location and Time */}
         <div className="flex items-center text-xs text-gray-500 mb-2">
           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

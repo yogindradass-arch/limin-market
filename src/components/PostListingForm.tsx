@@ -47,6 +47,11 @@ export interface ListingFormData {
   priceType?: string;
   hourlyRate?: number;
   responseTime?: string;
+  // Delivery fields
+  deliveryAvailable?: boolean;
+  deliveryOption?: 'pickup' | 'delivery' | 'both';
+  deliveryFee?: number;
+  deliveryZones?: string[];
 }
 
 const categories = [
@@ -894,6 +899,115 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                     <option value="By Appointment">By Appointment</option>
                   </select>
                 </div>
+              </div>
+            )}
+
+            {/* Delivery Options - Show for all categories except Jobs */}
+            {formData.category && formData.category !== 'Jobs' && (
+              <div className="space-y-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <span className="text-xl">🚚</span> Delivery Options
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    How will buyers receive this item?
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="deliveryOption"
+                        value="pickup"
+                        checked={formData.deliveryOption === 'pickup'}
+                        onChange={(e) => handleChange('deliveryOption', e.target.value)}
+                        className="h-4 w-4 text-limin-primary focus:ring-limin-primary"
+                      />
+                      <div>
+                        <span className="text-sm font-medium">Pickup Only</span>
+                        <p className="text-xs text-gray-600">Buyer must collect in person</p>
+                      </div>
+                    </label>
+
+                    <label className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="deliveryOption"
+                        value="delivery"
+                        checked={formData.deliveryOption === 'delivery'}
+                        onChange={(e) => handleChange('deliveryOption', e.target.value)}
+                        className="h-4 w-4 text-limin-primary focus:ring-limin-primary"
+                      />
+                      <div>
+                        <span className="text-sm font-medium">Delivery Only</span>
+                        <p className="text-xs text-gray-600">You will deliver to buyer</p>
+                      </div>
+                    </label>
+
+                    <label className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="deliveryOption"
+                        value="both"
+                        checked={formData.deliveryOption === 'both'}
+                        onChange={(e) => handleChange('deliveryOption', e.target.value)}
+                        className="h-4 w-4 text-limin-primary focus:ring-limin-primary"
+                      />
+                      <div>
+                        <span className="text-sm font-medium">Both Available</span>
+                        <p className="text-xs text-gray-600">Pickup or delivery options</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Show delivery fee input if delivery is available */}
+                {(formData.deliveryOption === 'delivery' || formData.deliveryOption === 'both') && (
+                  <>
+                    <div>
+                      <label htmlFor="deliveryFee" className="block text-sm font-medium text-gray-700 mb-2">
+                        Delivery Fee (GYD)
+                      </label>
+                      <input
+                        type="number"
+                        id="deliveryFee"
+                        value={formData.deliveryFee || 0}
+                        onChange={(e) => handleChange('deliveryFee', parseInt(e.target.value) || 0)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
+                        placeholder="Enter 0 for free delivery"
+                        min="0"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formData.deliveryFee === 0 ? '✅ Free delivery' : `Buyers will pay $${formData.deliveryFee} GYD for delivery`}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Delivery Zones (Select all that apply)
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Georgetown', 'East Coast', 'West Coast', 'East Bank', 'West Bank', 'Linden', 'New Amsterdam', 'Nationwide'].map(zone => (
+                          <label key={zone} className="flex items-center gap-2 p-2 border border-gray-300 rounded cursor-pointer hover:bg-orange-100">
+                            <input
+                              type="checkbox"
+                              checked={formData.deliveryZones?.includes(zone) || false}
+                              onChange={(e) => {
+                                const currentZones = formData.deliveryZones || [];
+                                const newZones = e.target.checked
+                                  ? [...currentZones, zone]
+                                  : currentZones.filter(z => z !== zone);
+                                handleChange('deliveryZones', newZones as any);
+                              }}
+                              className="h-4 w-4 text-limin-primary focus:ring-limin-primary"
+                            />
+                            <span className="text-sm">{zone}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

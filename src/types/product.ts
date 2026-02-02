@@ -52,4 +52,9 @@ export interface Product {
   priceType?: string;  // Hourly, Per Job, Per Item, Per Mile
   hourlyRate?: number;
   responseTime?: string;  // Same Day, 24 Hours, 48 Hours
+  // Delivery fields
+  deliveryAvailable?: boolean;  // Whether seller offers delivery
+  deliveryOption?: 'pickup' | 'delivery' | 'both';  // Delivery option
+  deliveryFee?: number;  // Delivery fee in GYD (0 for free delivery)
+  deliveryZones?: string[];  // Areas where delivery is available
 }
