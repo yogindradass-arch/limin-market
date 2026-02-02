@@ -58,9 +58,10 @@ export async function moderateImage(file: File): Promise<ImageModerationResult> 
     console.log('🔍 Image moderation results:', predictions);
 
     // Define thresholds for each category
-    const PORN_THRESHOLD = 0.3;      // Block if >30% porn
-    const HENTAI_THRESHOLD = 0.3;    // Block if >30% hentai
-    const SEXY_THRESHOLD = 0.6;      // Block if >60% sexy (more lenient)
+    // Higher thresholds = more lenient (reduces false positives for cars, products, etc.)
+    const PORN_THRESHOLD = 0.6;      // Block if >60% porn (was 30%)
+    const HENTAI_THRESHOLD = 0.6;    // Block if >60% hentai (was 30%)
+    const SEXY_THRESHOLD = 0.85;     // Block if >85% sexy (was 60%)
 
     // Find the predictions
     const pornScore = predictions.find(p => p.className === 'Porn')?.probability || 0;
