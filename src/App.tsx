@@ -1311,6 +1311,7 @@ export default function App() {
           <TrendingSection
             products={trendingProducts}
             onProductClick={handleProductClick}
+            currency={currency}
           />
         )}
 

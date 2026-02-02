@@ -1,11 +1,13 @@
 import type { Product } from '../types/product';
+import { convertPrice } from '../lib/currency';
 
 interface TrendingSectionProps {
   products: Product[];
   onProductClick: (product: Product) => void;
+  currency?: 'GYD' | 'USD';
 }
 
-export default function TrendingSection({ products, onProductClick }: TrendingSectionProps) {
+export default function TrendingSection({ products, onProductClick, currency = 'GYD' }: TrendingSectionProps) {
   if (products.length === 0) return null;
 
   // Get category-specific icon for listings without images
@@ -86,7 +88,7 @@ export default function TrendingSection({ products, onProductClick }: TrendingSe
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-limin-primary whitespace-nowrap">
-                  {product.price === 0 ? 'FREE' : <>${product.price.toLocaleString()} <span className="text-[10px] opacity-70">GYD</span></>}
+                  {product.price === 0 ? 'FREE' : <>${convertPrice(product.price, currency).toFixed(2)} <span className="text-[10px] opacity-70">{currency}</span></>}
                 </span>
                 <div className="flex items-center gap-1 text-[10px] text-gray-500">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
