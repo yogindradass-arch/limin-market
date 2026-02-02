@@ -87,11 +87,6 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle,
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
-          {product.category === 'Home-Made 🇬🇾' && (
-            <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-              🇬🇾 HOME-MADE
-            </span>
-          )}
           {product.listingMode === 'seeking' && (
             <span className="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
               🔍 WANTED

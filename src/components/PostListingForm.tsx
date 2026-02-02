@@ -52,11 +52,6 @@ export interface ListingFormData {
   deliveryOption?: 'pickup' | 'delivery' | 'both';
   deliveryFee?: number;
   deliveryZones?: string[];
-  // Home-Made fields
-  homeMadeType?: string;
-  ingredients?: string;
-  shelfLife?: string;
-  isRefrigerated?: boolean;
 }
 
 const categories = [
@@ -68,7 +63,6 @@ const categories = [
   'Real Estate',
   'Jobs',
   'Services',
-  'Home-Made 🇬🇾',
   'Books',
   'Furniture',
   'Tools',
@@ -904,97 +898,6 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                     <option value="48 Hours">48 Hours</option>
                     <option value="By Appointment">By Appointment</option>
                   </select>
-                </div>
-              </div>
-            )}
-
-            {/* Home-Made Specific Fields */}
-            {formData.category === 'Home-Made 🇬🇾' && (
-              <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-300">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <span className="text-xl">🇬🇾</span> Guyanese Home-Made Details
-                </h3>
-
-                <div>
-                  <label htmlFor="homeMadeType" className="block text-sm font-medium text-gray-700 mb-2">
-                    Item Type
-                  </label>
-                  <select
-                    id="homeMadeType"
-                    value={formData.homeMadeType || ''}
-                    onChange={(e) => handleChange('homeMadeType', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-                  >
-                    <option value="">Select type</option>
-                    <option value="Pepper Sauce">Pepper Sauce</option>
-                    <option value="Cassava Bread">Cassava Bread</option>
-                    <option value="Plait Bread">Plait Bread</option>
-                    <option value="Tennis Roll">Tennis Roll</option>
-                    <option value="Salara (Red Cake)">Salara (Red Cake)</option>
-                    <option value="Pine Tart">Pine Tart</option>
-                    <option value="Cheese Roll">Cheese Roll</option>
-                    <option value="Mango Chutney">Mango Chutney</option>
-                    <option value="Tamarind Chutney">Tamarind Chutney</option>
-                    <option value="Achar">Achar</option>
-                    <option value="Cassareep">Cassareep</option>
-                    <option value="Pepperpot Base">Pepperpot Base</option>
-                    <option value="Mithai">Mithai</option>
-                    <option value="Pera">Pera</option>
-                    <option value="Parsad">Parsad</option>
-                    <option value="Black Cake">Black Cake</option>
-                    <option value="Fudge">Fudge</option>
-                    <option value="Mauby">Mauby</option>
-                    <option value="Sorrel Drink">Sorrel Drink</option>
-                    <option value="Ginger Beer">Ginger Beer</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="ingredients" className="block text-sm font-medium text-gray-700 mb-2">
-                    Main Ingredients
-                  </label>
-                  <input
-                    type="text"
-                    id="ingredients"
-                    value={formData.ingredients || ''}
-                    onChange={(e) => handleChange('ingredients', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-                    placeholder="e.g., Scotch bonnet peppers, vinegar, garlic"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="shelfLife" className="block text-sm font-medium text-gray-700 mb-2">
-                    Shelf Life
-                  </label>
-                  <select
-                    id="shelfLife"
-                    value={formData.shelfLife || ''}
-                    onChange={(e) => handleChange('shelfLife', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-                  >
-                    <option value="">Select shelf life</option>
-                    <option value="1-2 days">1-2 days</option>
-                    <option value="3-5 days">3-5 days</option>
-                    <option value="1 week">1 week</option>
-                    <option value="2 weeks">2 weeks</option>
-                    <option value="1 month">1 month</option>
-                    <option value="2-3 months">2-3 months</option>
-                    <option value="6+ months">6+ months</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.isRefrigerated || false}
-                      onChange={(e) => handleChange('isRefrigerated', e.target.checked)}
-                      className="h-4 w-4 text-limin-primary focus:ring-limin-primary border-gray-300 rounded"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Requires Refrigeration</span>
-                  </label>
                 </div>
               </div>
             )}

@@ -296,11 +296,6 @@ export default function App() {
             deliveryOption: item.delivery_option,
             deliveryFee: item.delivery_fee,
             deliveryZones: item.delivery_zones,
-            // Home-Made fields
-            homeMadeType: item.home_made_type,
-            ingredients: item.ingredients,
-            shelfLife: item.shelf_life,
-            isRefrigerated: item.is_refrigerated,
           };
         });
 
@@ -502,11 +497,6 @@ export default function App() {
             delivery_option: listingData.deliveryOption,
             delivery_fee: listingData.deliveryFee || 0,
             delivery_zones: listingData.deliveryZones || [],
-            // Home-Made fields
-            home_made_type: listingData.homeMadeType,
-            ingredients: listingData.ingredients,
-            shelf_life: listingData.shelfLife,
-            is_refrigerated: listingData.isRefrigerated || false,
           },
         ])
         .select();
@@ -607,11 +597,6 @@ export default function App() {
           delivery_option: listing.deliveryOption,
           delivery_fee: listing.deliveryFee || 0,
           delivery_zones: listing.deliveryZones || [],
-          // Home-Made fields
-          home_made_type: listing.homeMadeType,
-          ingredients: listing.ingredients,
-          shelf_life: listing.shelfLife,
-          is_refrigerated: listing.isRefrigerated || false,
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings
