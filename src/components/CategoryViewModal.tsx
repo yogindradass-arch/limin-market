@@ -35,7 +35,17 @@ export default function CategoryViewModal({
   };
 
   const categoryInfo = getCategoryInfo();
+
+  // Debug logging
+  console.log('🔍 CategoryViewModal Debug:');
+  console.log('  Category searching for:', category);
+  console.log('  Total products passed:', products.length);
+  console.log('  All categories in products:', products.map(p => `"${p.category}"`).join(', '));
+  console.log('  Product titles:', products.map(p => p.title));
+
   const filteredProducts = products.filter(p => p.category === category);
+  console.log('  Filtered products count:', filteredProducts.length);
+  console.log('  Filtered product titles:', filteredProducts.map(p => p.title));
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-50">
