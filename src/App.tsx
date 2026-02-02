@@ -1290,9 +1290,9 @@ export default function App() {
       );
     }
 
-    // Get trending products (most viewed)
-    const trendingProducts = getFilteredProducts([...allProducts]
-      .sort((a, b) => (b.views || 0) - (a.views || 0)))
+    // Get trending products (most viewed) - apply filters but not user sorting
+    const trendingProducts = getFilteredProducts([...allProducts])
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, 10);
 
     // Count new listings today
