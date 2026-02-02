@@ -63,7 +63,7 @@ export default function App() {
 
   // Sort and Filter state
   const [sortBy, setSortBy] = useState('newest');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]); // Increased max to accommodate all prices
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]); // Matches slider max value
   const [showFreeOnly, setShowFreeOnly] = useState(false);
 
   // Advanced Search state
@@ -996,7 +996,12 @@ export default function App() {
       filtered = filtered.filter(p => p.price === 0);
     } else {
       // Apply price range filter (only if not showing free items)
-      filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+      // When max is 10000, show all items >= that price (10000+)
+      filtered = filtered.filter(p => {
+        const meetsMin = p.price >= priceRange[0];
+        const meetsMax = priceRange[1] >= 10000 ? true : p.price <= priceRange[1];
+        return meetsMin && meetsMax;
+      });
     }
 
     // Apply sorting
@@ -1286,8 +1291,8 @@ export default function App() {
     }
 
     // Get trending products (most viewed)
-    const trendingProducts = [...allProducts]
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
+    const trendingProducts = getFilteredProducts([...allProducts]
+      .sort((a, b) => (b.views || 0) - (a.views || 0)))
       .slice(0, 10);
 
     // Count new listings today
@@ -1346,7 +1351,7 @@ export default function App() {
             </div>
             {(() => {
               // Only apply filters if user has explicitly set any filters
-              const hasActiveFilters = showFreeOnly || activeFilter !== 'All' || selectedCategory !== null || advancedFilters.categories.length > 0 || advancedFilters.priceMin !== undefined || advancedFilters.priceMax !== undefined || advancedFilters.location || advancedFilters.listingType || advancedFilters.listingMode;
+              const hasActiveFilters = showFreeOnly || activeFilter !== 'All' || selectedCategory !== null || priceRange[0] > 0 || priceRange[1] < 10000 || advancedFilters.categories.length > 0 || advancedFilters.priceMin !== undefined || advancedFilters.priceMax !== undefined || advancedFilters.location || advancedFilters.listingType || advancedFilters.listingMode;
               const recentProducts = hasActiveFilters
                 ? getFilteredProducts(allProducts)
                 : allProducts.slice(0, 10);

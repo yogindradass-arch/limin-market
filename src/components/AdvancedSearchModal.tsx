@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { SearchFilters } from '../types/search';
 import { countActiveFilters, getFilterSummary } from '../types/search';
 import CategorySpecificFilters from './CategorySpecificFilters';
+import PriceRangeSlider from './PriceRangeSlider';
 import { supabase } from '../lib/supabase';
 
 interface AdvancedSearchModalProps {
@@ -209,48 +210,20 @@ export default function AdvancedSearchModal({
           {/* Price Range */}
           <div>
             <h3 className="font-bold text-limin-dark text-lg mb-3">Price Range</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Min Price
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input
-                    type="number"
-                    placeholder="0"
-                    value={filters.priceMin || ''}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        priceMin: e.target.value ? Number(e.target.value) : undefined,
-                      })
-                    }
-                    className="w-full pl-8 pr-3 py-3 border-2 border-gray-300 rounded-lg focus:border-limin-primary focus:outline-none"
-                    min="0"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Max Price
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                  <input
-                    type="number"
-                    placeholder="Any"
-                    value={filters.priceMax || ''}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        priceMax: e.target.value ? Number(e.target.value) : undefined,
-                      })
-                    }
-                    className="w-full pl-8 pr-3 py-3 border-2 border-gray-300 rounded-lg focus:border-limin-primary focus:outline-none"
-                    min="0"
-                  />
-                </div>
-              </div>
-            </div>
+            <PriceRangeSlider
+              min={0}
+              max={100000}
+              minValue={filters.priceMin || 0}
+              maxValue={filters.priceMax || 100000}
+              step={100}
+              onChange={(min, max) => {
+                handleFilterChange({
+                  priceMin: min > 0 ? min : undefined,
+                  priceMax: max < 100000 ? max : undefined,
+                });
+              }}
+              formatValue={(v) => `$${v.toLocaleString()} GYD`}
+            />
           </div>
 
           {/* Location */}

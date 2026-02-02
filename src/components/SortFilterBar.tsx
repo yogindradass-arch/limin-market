@@ -1,3 +1,5 @@
+import PriceRangeSlider from './PriceRangeSlider';
+
 interface SortFilterBarProps {
   sortBy: string;
   onSortChange: (sort: string) => void;
@@ -54,32 +56,19 @@ export default function SortFilterBar({
           </div>
         </div>
 
-        {/* Price Range Filter */}
+        {/* Price Range Slider */}
         {!showFreeOnly && (
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs text-gray-600">Price Range</label>
-              <span className="text-xs text-gray-700 font-medium">
-                ${priceRange[0]} - ${priceRange[1] === 10000 ? '10,000+' : priceRange[1]}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => onPriceRangeChange([Number(e.target.value), priceRange[1]])}
-                placeholder="Min"
-                className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-              />
-              <span className="text-gray-500">to</span>
-              <input
-                type="number"
-                value={priceRange[1] === 10000 ? '' : priceRange[1]}
-                onChange={(e) => onPriceRangeChange([priceRange[0], Number(e.target.value) || 10000])}
-                placeholder="Max"
-                className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-limin-primary focus:border-transparent"
-              />
-            </div>
+          <div className="bg-gray-50 rounded-lg px-8 py-5 overflow-hidden">
+            <PriceRangeSlider
+              min={0}
+              max={10000}
+              minValue={priceRange[0]}
+              maxValue={priceRange[1]}
+              step={50}
+              onChange={(min, max) => onPriceRangeChange([min, max])}
+              formatValue={(v) => v === 10000 ? '$10,000+' : `$${v.toLocaleString()} GYD`}
+              compact={true}
+            />
           </div>
         )}
 
