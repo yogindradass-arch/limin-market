@@ -57,4 +57,10 @@ export interface Product {
   deliveryOption?: 'pickup' | 'delivery' | 'both';  // Delivery option
   deliveryFee?: number;  // Delivery fee in GYD (0 for free delivery)
   deliveryZones?: string[];  // Areas where delivery is available
+  // Diaspora Shopping "Send Home" fields
+  sendHomeAvailable?: boolean;  // Whether seller ships to diaspora
+  sendHomeShippingFee?: number;  // International shipping fee in USD
+  sendHomeCarrier?: string;  // Shipping carrier (FedEx, DHL, USPS, etc.)
+  sendHomeDeliveryTime?: string;  // Estimated delivery time (e.g., "5-7 days")
+  sendHomeDestinations?: string[];  // Available shipping destinations
 }

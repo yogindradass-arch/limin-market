@@ -296,6 +296,12 @@ export default function App() {
             deliveryOption: item.delivery_option,
             deliveryFee: item.delivery_fee,
             deliveryZones: item.delivery_zones,
+            // Diaspora Shopping "Send Home" fields
+            sendHomeAvailable: item.send_home_available,
+            sendHomeShippingFee: item.send_home_shipping_fee,
+            sendHomeCarrier: item.send_home_carrier,
+            sendHomeDeliveryTime: item.send_home_delivery_time,
+            sendHomeDestinations: item.send_home_destinations,
           };
         });
 
@@ -497,6 +503,12 @@ export default function App() {
             delivery_option: listingData.deliveryOption,
             delivery_fee: listingData.deliveryFee || 0,
             delivery_zones: listingData.deliveryZones || [],
+            // Diaspora Shopping "Send Home" fields
+            send_home_available: listingData.sendHomeAvailable || false,
+            send_home_shipping_fee: listingData.sendHomeShippingFee || 0,
+            send_home_carrier: listingData.sendHomeCarrier,
+            send_home_delivery_time: listingData.sendHomeDeliveryTime,
+            send_home_destinations: listingData.sendHomeDestinations || [],
           },
         ])
         .select();
@@ -597,6 +609,12 @@ export default function App() {
           delivery_option: listing.deliveryOption,
           delivery_fee: listing.deliveryFee || 0,
           delivery_zones: listing.deliveryZones || [],
+          // Diaspora Shopping "Send Home" fields
+          send_home_available: listing.sendHomeAvailable || false,
+          send_home_shipping_fee: listing.sendHomeShippingFee || 0,
+          send_home_carrier: listing.sendHomeCarrier,
+          send_home_delivery_time: listing.sendHomeDeliveryTime,
+          send_home_destinations: listing.sendHomeDestinations || [],
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings

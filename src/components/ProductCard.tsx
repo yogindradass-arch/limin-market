@@ -92,6 +92,11 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle,
               🔍 WANTED
             </span>
           )}
+          {product.sendHomeAvailable && (
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1 shadow-lg">
+              🇬🇾→🇺🇸 SEND HOME
+            </span>
+          )}
           {product.listingType && (
             <>
               {product.listingType === 'wholesale' && (

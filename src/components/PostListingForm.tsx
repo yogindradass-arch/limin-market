@@ -52,6 +52,12 @@ export interface ListingFormData {
   deliveryOption?: 'pickup' | 'delivery' | 'both';
   deliveryFee?: number;
   deliveryZones?: string[];
+  // Diaspora Shopping "Send Home" fields
+  sendHomeAvailable?: boolean;
+  sendHomeShippingFee?: number;
+  sendHomeCarrier?: string;
+  sendHomeDeliveryTime?: string;
+  sendHomeDestinations?: string[];
 }
 
 const categories = [
@@ -1007,6 +1013,133 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                       </div>
                     </div>
                   </>
+                )}
+              </div>
+            )}
+
+            {/* Diaspora Shopping "Send Home" - Show for physical products only */}
+            {formData.category && !['Jobs', 'Services', 'Real Estate'].includes(formData.category) && (
+              <div className="space-y-4 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border-2 border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                      <span className="text-xl">🇬🇾→🇺🇸</span> Diaspora Shopping (Send Home)
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1">Ship items to buyers in the USA, Canada & UK</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.sendHomeAvailable || false}
+                      onChange={(e) => setFormData(prev => ({ ...prev, sendHomeAvailable: e.target.checked }))}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                {formData.sendHomeAvailable && (
+                  <div className="space-y-4 pt-3 border-t border-blue-200">
+                    {/* Shipping Carrier */}
+                    <div>
+                      <label htmlFor="sendHomeCarrier" className="block text-sm font-medium text-gray-700 mb-2">
+                        Shipping Carrier
+                      </label>
+                      <select
+                        id="sendHomeCarrier"
+                        value={formData.sendHomeCarrier || ''}
+                        onChange={(e) => handleChange('sendHomeCarrier', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Select carrier</option>
+                        <option value="FedEx">FedEx</option>
+                        <option value="DHL">DHL</option>
+                        <option value="USPS">USPS</option>
+                        <option value="UPS">UPS</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Shipping Fee */}
+                    <div>
+                      <label htmlFor="sendHomeShippingFee" className="block text-sm font-medium text-gray-700 mb-2">
+                        International Shipping Fee (USD)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-2 text-gray-500">$</span>
+                        <input
+                          type="number"
+                          id="sendHomeShippingFee"
+                          value={formData.sendHomeShippingFee || 0}
+                          onChange={(e) => handleChange('sendHomeShippingFee', parseFloat(e.target.value) || 0)}
+                          className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="0.00"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formData.sendHomeShippingFee === 0 ? '✅ Free international shipping' : `Buyers will pay $${formData.sendHomeShippingFee?.toFixed(2) || '0.00'} USD for shipping`}
+                      </p>
+                    </div>
+
+                    {/* Delivery Time */}
+                    <div>
+                      <label htmlFor="sendHomeDeliveryTime" className="block text-sm font-medium text-gray-700 mb-2">
+                        Estimated Delivery Time
+                      </label>
+                      <select
+                        id="sendHomeDeliveryTime"
+                        value={formData.sendHomeDeliveryTime || ''}
+                        onChange={(e) => handleChange('sendHomeDeliveryTime', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Select delivery time</option>
+                        <option value="3-5 days">3-5 business days</option>
+                        <option value="5-7 days">5-7 business days</option>
+                        <option value="7-10 days">7-10 business days</option>
+                        <option value="10-14 days">10-14 business days</option>
+                        <option value="2-3 weeks">2-3 weeks</option>
+                      </select>
+                    </div>
+
+                    {/* Shipping Destinations */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Available Shipping Destinations
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { code: 'usa', label: '🇺🇸 USA', value: 'USA' },
+                          { code: 'canada', label: '🇨🇦 Canada', value: 'Canada' },
+                          { code: 'uk', label: '🇬🇧 United Kingdom', value: 'UK' },
+                          { code: 'caribbean', label: '🏝️ Caribbean', value: 'Caribbean' }
+                        ].map(dest => (
+                          <label key={dest.code} className="flex items-center gap-2 p-2 border border-gray-300 rounded cursor-pointer hover:bg-blue-50">
+                            <input
+                              type="checkbox"
+                              checked={formData.sendHomeDestinations?.includes(dest.value) || false}
+                              onChange={(e) => {
+                                const currentDests = formData.sendHomeDestinations || [];
+                                const newDests = e.target.checked
+                                  ? [...currentDests, dest.value]
+                                  : currentDests.filter(d => d !== dest.value);
+                                handleChange('sendHomeDestinations', newDests as any);
+                              }}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm">{dest.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <p className="text-xs text-blue-800">
+                        <strong>💡 Tip:</strong> Items with "Send Home" shipping are displayed to diaspora buyers in USD and include international shipping options.
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
