@@ -62,7 +62,7 @@ export default function App() {
 
   // Sort and Filter state
   const [sortBy, setSortBy] = useState('newest');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]); // Increased max to accommodate all prices
   const [showFreeOnly, setShowFreeOnly] = useState(false);
 
   // Advanced Search state
