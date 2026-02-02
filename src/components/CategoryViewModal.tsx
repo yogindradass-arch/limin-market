@@ -8,6 +8,7 @@ interface CategoryViewModalProps {
   products: Product[];
   onProductClick: (product: Product) => void;
   onFavoriteToggle: (productId: string) => void;
+  currency?: 'GYD' | 'USD';
 }
 
 export default function CategoryViewModal({
@@ -16,7 +17,8 @@ export default function CategoryViewModal({
   category,
   products,
   onProductClick,
-  onFavoriteToggle
+  onFavoriteToggle,
+  currency = 'GYD'
 }: CategoryViewModalProps) {
   if (!isOpen) return null;
 
@@ -91,6 +93,7 @@ export default function CategoryViewModal({
                   product={product}
                   onProductClick={onProductClick}
                   onFavoriteToggle={onFavoriteToggle}
+                  currency={currency}
                 />
               ))}
             </div>

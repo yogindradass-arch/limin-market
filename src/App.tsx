@@ -54,6 +54,7 @@ export default function App() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showNotificationPreferences, setShowNotificationPreferences] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('Georgetown');
+  const [currency, setCurrency] = useState<'GYD' | 'USD'>('GYD');
 
   // Messaging state
   const [showChat, setShowChat] = useState(false);
@@ -295,6 +296,11 @@ export default function App() {
             deliveryOption: item.delivery_option,
             deliveryFee: item.delivery_fee,
             deliveryZones: item.delivery_zones,
+            // Home-Made fields
+            homeMadeType: item.home_made_type,
+            ingredients: item.ingredients,
+            shelfLife: item.shelf_life,
+            isRefrigerated: item.is_refrigerated,
           };
         });
 
@@ -496,6 +502,11 @@ export default function App() {
             delivery_option: listingData.deliveryOption,
             delivery_fee: listingData.deliveryFee || 0,
             delivery_zones: listingData.deliveryZones || [],
+            // Home-Made fields
+            home_made_type: listingData.homeMadeType,
+            ingredients: listingData.ingredients,
+            shelf_life: listingData.shelfLife,
+            is_refrigerated: listingData.isRefrigerated || false,
           },
         ])
         .select();
@@ -596,6 +607,11 @@ export default function App() {
           delivery_option: listing.deliveryOption,
           delivery_fee: listing.deliveryFee || 0,
           delivery_zones: listing.deliveryZones || [],
+          // Home-Made fields
+          home_made_type: listing.homeMadeType,
+          ingredients: listing.ingredients,
+          shelf_life: listing.shelfLife,
+          is_refrigerated: listing.isRefrigerated || false,
         })
         .eq('id', productId)
         .eq('seller_id', user.id); // Ensure user can only update their own listings
@@ -1107,6 +1123,7 @@ export default function App() {
                       product={{...p, isFavorited: favorites.has(p.id)}}
                       onProductClick={handleProductClick}
                       onFavoriteToggle={toggleFav}
+                      currency={currency}
                     />
                   ))}
                 </div>
@@ -1181,7 +1198,7 @@ export default function App() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {favoritedProducts.map(p => (
-                <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} currency={currency} />
               ))}
             </div>
           )}
@@ -1206,7 +1223,7 @@ export default function App() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {localProducts.map(p => (
-                <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} currency={currency} />
               ))}
             </div>
           )}
@@ -1333,7 +1350,7 @@ export default function App() {
               return recentProducts.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3">
                   {recentProducts.map(p => (
-                    <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                    <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} currency={currency} />
                   ))}
                 </div>
               ) : (
@@ -1412,7 +1429,7 @@ export default function App() {
                 {filteredFreeItems.length > 0 ? (
                   <div className="grid grid-cols-3 gap-3">
                     {filteredFreeItems.map(p => (
-                      <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} />
+                      <ProductCard key={p.id} product={{...p, isFavorited: favorites.has(p.id)}} onProductClick={handleProductClick} onFavoriteToggle={toggleFav} currency={currency} />
                     ))}
                   </div>
                 ) : (
@@ -1463,7 +1480,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-dark-bg pb-16 transition-colors duration-200">
-      <Header onMenuClick={() => setShowMenu(true)} onSearchClick={() => setShowSearch(true)} />
+      <Header
+        onMenuClick={() => setShowMenu(true)}
+        onSearchClick={() => setShowSearch(true)}
+        currency={currency}
+        onCurrencyToggle={() => setCurrency(currency === 'GYD' ? 'USD' : 'GYD')}
+      />
       <LocationBar location={`${currentLocation}, Guyana`} onLocationClick={() => setShowLocationSelector(true)} />
       {activeTab === 'home' && <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />}
       {activeTab === 'home' && (
@@ -1552,6 +1574,7 @@ export default function App() {
                         product={{...p, isFavorited: favorites.has(p.id)}}
                         onProductClick={handleProductClick}
                         onFavoriteToggle={toggleFav}
+                        currency={currency}
                       />
                     ))}
                 </div>
@@ -1759,6 +1782,7 @@ export default function App() {
         products={products}
         onProductClick={handleProductClick}
         onFavoriteToggle={toggleFav}
+        currency={currency}
       />
     </div>
   );

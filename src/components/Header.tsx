@@ -1,9 +1,11 @@
 interface HeaderProps {
   onMenuClick?: () => void;
   onSearchClick?: () => void;
+  currency?: 'GYD' | 'USD';
+  onCurrencyToggle?: () => void;
 }
 
-export default function Header({ onMenuClick, onSearchClick }: HeaderProps) {
+export default function Header({ onMenuClick, onSearchClick, currency = 'GYD', onCurrencyToggle }: HeaderProps) {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="flex items-center justify-between h-14 px-4">
@@ -28,6 +30,16 @@ export default function Header({ onMenuClick, onSearchClick }: HeaderProps) {
           <span className="text-2xl">🇬🇾</span>
           Limin Market
         </h1>
+
+        {/* Currency Toggle */}
+        <button
+          onClick={onCurrencyToggle}
+          className="px-3 py-1.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 rounded-full transition-colors flex items-center gap-1"
+          aria-label="Toggle currency"
+        >
+          <span>{currency === 'GYD' ? '🇬🇾' : '🇺🇸'}</span>
+          <span>{currency}</span>
+        </button>
 
         {/* Search Icon */}
         <button

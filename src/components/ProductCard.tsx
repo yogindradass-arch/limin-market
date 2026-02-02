@@ -1,12 +1,14 @@
 import type { Product } from '../types/product';
+import { convertPrice } from '../lib/currency';
 
 interface ProductCardProps {
   product: Product;
   onProductClick?: (product: Product) => void;
   onFavoriteToggle?: (productId: string) => void;
+  currency?: 'GYD' | 'USD';
 }
 
-export default function ProductCard({ product, onProductClick, onFavoriteToggle }: ProductCardProps) {
+export default function ProductCard({ product, onProductClick, onFavoriteToggle, currency = 'GYD' }: ProductCardProps) {
   const handleClick = () => {
     if (onProductClick) {
       onProductClick(product);
@@ -85,6 +87,11 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {product.category === 'Home-Made 🇬🇾' && (
+            <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+              🇬🇾 HOME-MADE
+            </span>
+          )}
           {product.listingMode === 'seeking' && (
             <span className="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
               🔍 WANTED
@@ -140,10 +147,10 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
             product.price === 0 ? (
               <span className="text-purple-600">Budget: Negotiable</span>
             ) : (
-              <span className="text-purple-600">Budget: ${product.price.toFixed(2)} <span className="text-xs opacity-70">GYD</span></span>
+              <span className="text-purple-600">Budget: ${convertPrice(product.price, currency).toFixed(2)} <span className="text-xs opacity-70">{currency}</span></span>
             )
           ) : (
-            product.price === 0 ? 'FREE' : <>${product.price.toFixed(2)} <span className="text-xs opacity-70">GYD</span></>
+            product.price === 0 ? 'FREE' : <>${convertPrice(product.price, currency).toFixed(2)} <span className="text-xs opacity-70">{currency}</span></>
           )}
         </p>
 
@@ -193,7 +200,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
             {product.serviceType && <span>{product.serviceType}</span>}
             {product.serviceType && product.priceType && <span>•</span>}
             {product.priceType && product.hourlyRate && (
-              <span className="whitespace-nowrap">${product.hourlyRate} <span className="text-[10px] opacity-70">GYD</span>/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
+              <span className="whitespace-nowrap">${convertPrice(product.hourlyRate, currency).toFixed(2)} <span className="text-[10px] opacity-70">{currency}</span>/{product.priceType === 'Hourly' ? 'hr' : product.priceType.toLowerCase()}</span>
             )}
             {(product.serviceType || product.priceType) && product.responseTime && <span>•</span>}
             {product.responseTime && <span>{product.responseTime}</span>}
@@ -205,7 +212,7 @@ export default function ProductCard({ product, onProductClick, onFavoriteToggle 
           <div className="mb-2 flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full w-fit">
             <span>🚚</span>
             <span className="font-medium">
-              {product.deliveryFee === 0 ? 'Free Delivery' : `Delivery $${product.deliveryFee}`}
+              {product.deliveryFee === 0 ? 'Free Delivery' : `Delivery $${convertPrice(product.deliveryFee || 0, currency).toFixed(2)} ${currency}`}
             </span>
           </div>
         )}
