@@ -30,7 +30,7 @@ export default function Header({ onMenuClick, onSearchClick, currency = 'GYD', o
         {/* Center: Logo/Brand */}
         <h1 className="text-xl font-bold text-limin-dark flex items-center justify-center gap-2">
           <span className="text-2xl">🇬🇾</span>
-          Limin Market
+          <span className="whitespace-nowrap">Limin Market</span>
         </h1>
 
         {/* Right: Currency Toggle & Search */}
