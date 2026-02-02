@@ -1488,7 +1488,16 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-dark-bg pb-16 transition-colors duration-200">
+    <div
+      className="min-h-screen bg-gray-100 dark:bg-dark-bg pb-16 transition-colors duration-200"
+      style={{
+        backgroundImage: 'url(/images/guyana-pattern.png)',
+        backgroundRepeat: 'repeat',
+        backgroundSize: '600px',
+        backgroundBlendMode: 'multiply',
+        opacity: 0.98
+      }}
+    >
       <Header
         onMenuClick={() => setShowMenu(true)}
         onSearchClick={() => setShowSearch(true)}
