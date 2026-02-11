@@ -1612,6 +1612,7 @@ export default function App() {
             location: editingProduct.location,
             phone: editingProduct.sellerPhone,
             listingType: editingProduct.listingType || 'standard',
+            listingMode: editingProduct.listingMode || 'offering',
             image: editingProduct.image,
             images: editingProduct.images || [editingProduct.image],
           } : undefined}
