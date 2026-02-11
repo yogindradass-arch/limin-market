@@ -1,3 +1,5 @@
+import CulturalCalendar from './CulturalCalendar';
+
 interface SideMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -119,6 +121,11 @@ export default function SideMenu({
               </div>
             ))}
           </nav>
+
+          {/* Cultural Calendar */}
+          <div className="px-4 pb-4">
+            <CulturalCalendar />
+          </div>
 
           {/* Footer Info */}
           <div className="p-6 mt-4 border-t">
