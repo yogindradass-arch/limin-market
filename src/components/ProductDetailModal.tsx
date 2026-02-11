@@ -615,20 +615,27 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
               )}
 
               {/* Action Buttons */}
-              <div className="border-t pt-5 mt-5">
+              <div className="border-t pt-6 mt-6">
                 {/* Share Button - visible to everyone */}
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center mb-6">
                   <ShareButton product={product} />
                 </div>
 
                 {/* Contact Button - only show if not owner */}
                 {!isOwner && (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
+                    {/* Section Label */}
+                    <div className="flex items-center gap-2 px-1">
+                      <div className="h-px flex-1 bg-gray-200"></div>
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact Options</span>
+                      <div className="h-px flex-1 bg-gray-200"></div>
+                    </div>
+
                     {/* Contact Seller Button - Primary action for messaging */}
                     {user && onContactSeller && product.sellerId && (
                       <button
                         onClick={() => onContactSeller(product.id, product.sellerId!)}
-                        className="w-full bg-blue-500 text-white py-4 rounded-xl font-semibold hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                        className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -642,7 +649,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                       {/* Call Button */}
                       <a
                         href={`tel:${product.sellerPhone}`}
-                        className="bg-limin-primary text-white py-4 rounded-xl font-semibold hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                        className="bg-limin-primary text-white py-3 rounded-xl font-semibold hover:bg-opacity-90 transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -660,20 +667,22 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                         }}
                         type="message"
                         sellerPhone={product.sellerPhone}
-                        className="py-4 rounded-xl font-semibold shadow-md hover:shadow-lg text-sm"
+                        className="py-3 rounded-xl font-semibold shadow-sm hover:shadow-md text-sm"
                       />
                     </div>
 
-                    {/* Report Button */}
-                    <button
-                      onClick={() => setShowReportModal(true)}
-                      className="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:border-red-500 hover:text-red-500 transition-all flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                      Report Listing
-                    </button>
+                    {/* Report Link */}
+                    <div className="pt-2 flex justify-center">
+                      <button
+                        onClick={() => setShowReportModal(true)}
+                        className="text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-50"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Report Listing
+                      </button>
+                    </div>
 
                     {/* Safe Meeting Locations */}
                     <div className="mt-4">
