@@ -23,9 +23,9 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
 
           {/* Header */}
           <div className="bg-gradient-to-r from-limin-primary to-orange-600 px-8 pt-8 pb-6 rounded-t-2xl text-white">
-            <div className="text-5xl mb-3">🇬🇾</div>
+            <div className="text-5xl mb-3">🇬🇾 🌍</div>
             <h2 className="text-3xl font-bold mb-2">Limin Market</h2>
-            <p className="text-lg opacity-90">Where Guyana Limes & Trades</p>
+            <p className="text-lg opacity-90">Where Everyone Limes & Trades</p>
           </div>
 
           {/* Content */}
@@ -33,10 +33,11 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <section>
               <h3 className="text-lg font-bold text-limin-dark mb-3">What is Limin Market?</h3>
               <p className="text-gray-700 leading-relaxed">
-                Limin Market is Guyana's homegrown online marketplace where you can buy, sell, and trade
-                anything from electronics to furniture, vehicles to real estate, jobs to services.
-                With in-app messaging, seller ratings, advanced search, and analytics, we're bringing
-                modern e-commerce features to Guyana. Built by Guyanese, for Guyanese.
+                Born in the Guyanese community, built for everyone. Limin Market is your online marketplace
+                to buy, sell, and trade anything from electronics to furniture, vehicles to real estate,
+                jobs to services. Whether you're in Georgetown, Queens, Miami, or Toronto - connect with
+                your community, send items home, or shop internationally. With in-app messaging, seller
+                ratings, advanced search, and analytics, we're bringing modern e-commerce to diaspora communities worldwide.
               </p>
             </section>
 
@@ -89,9 +90,10 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <section>
               <h3 className="text-lg font-bold text-limin-dark mb-3">Our Mission</h3>
               <p className="text-gray-700 leading-relaxed">
-                To connect Guyanese buyers and sellers in every corner of the country, from Georgetown
-                to Lethem. We're making it easier than ever to find great deals, support local businesses,
-                and build stronger communities through trade.
+                To connect communities across borders - from Georgetown to Brooklyn, Miami to Toronto.
+                We make it easy to find great deals, support local businesses, send love back home,
+                and build stronger communities through trade. Whether you're shopping locally or
+                internationally, we're here to bring people together.
               </p>
             </section>
 
@@ -105,7 +107,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
 
             <section className="text-center pt-2">
               <p className="text-sm text-gray-600">
-                Made with ❤️ for Guyana
+                Born in Guyana 🇬🇾, built for everyone 🌍
               </p>
               <p className="text-xs text-gray-500 mt-1">Version 1.0.0</p>
             </section>

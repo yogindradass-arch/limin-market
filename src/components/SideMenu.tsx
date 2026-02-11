@@ -85,7 +85,7 @@ export default function SideMenu({
             </svg>
           </button>
           <h2 className="text-2xl font-bold mb-1">Limin Market</h2>
-          <p className="text-sm opacity-90">Where Guyana Limes & Trades</p>
+          <p className="text-sm opacity-90">Where Everyone Limes & Trades</p>
         </div>
 
         {/* Menu Items */}
@@ -125,7 +125,7 @@ export default function SideMenu({
             <div className="text-sm text-gray-600 space-y-2">
               <p><strong>Limin Market</strong></p>
               <p>Version 1.0.0</p>
-              <p className="text-xs">Made with ❤️ for Guyana 🇬🇾</p>
+              <p className="text-xs">Born in Guyana 🇬🇾, built for everyone 🌍</p>
             </div>
           </div>
         </div>

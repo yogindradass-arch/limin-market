@@ -108,12 +108,40 @@ const locations = [
   'Jamaica, NY',
   'Schenectady, NY',
   'Albany, NY',
-  // Florida
+  'Yonkers, NY',
+  'Mount Vernon, NY',
+  'Staten Island, NY',
+  // Florida 🌴
   'Miami, FL',
   'Fort Lauderdale, FL',
   'Orlando, FL',
-  // Other US Cities
+  'Lauderhill, FL',
+  'Pembroke Pines, FL',
+  'Miramar, FL',
+  'Tampa, FL',
+  'Jacksonville, FL',
+  // Other US Cities 🇺🇸
+  'Atlanta, GA',
+  'Houston, TX',
+  'Dallas, TX',
+  'Washington, DC',
+  'Charlotte, NC',
+  'Boston, MA',
+  'Philadelphia, PA',
+  'Chicago, IL',
+  'Los Angeles, CA',
+  'Baltimore, MD',
+  // Canada 🇨🇦
   'Toronto, Canada',
+  'Brampton, Canada',
+  'Mississauga, Canada',
+  'Scarborough, Canada',
+  'Markham, Canada',
+  // UK 🇬🇧
+  'London, UK',
+  'Birmingham, UK',
+  'Manchester, UK',
+  // Other
   'Other',
 ];
 
