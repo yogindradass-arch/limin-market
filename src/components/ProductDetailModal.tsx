@@ -616,18 +616,9 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
 
               {/* Action Buttons */}
               <div className="border-t pt-5 mt-5">
-                {/* Share Buttons - visible to everyone */}
-                <div className="flex justify-center gap-3 mb-4">
+                {/* Share Button - visible to everyone */}
+                <div className="flex justify-center mb-4">
                   <ShareButton product={product} />
-                  <WhatsAppShareButton
-                    product={{
-                      title: product.title,
-                      price: product.price,
-                      location: product.location,
-                      image_url: product.image
-                    }}
-                    type="share"
-                  />
                 </div>
 
                 {/* Contact Button - only show if not owner */}
