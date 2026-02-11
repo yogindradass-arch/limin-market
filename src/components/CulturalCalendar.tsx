@@ -10,7 +10,12 @@ interface CulturalEvent {
   related_products_category?: string;
 }
 
-export default function CulturalCalendar() {
+interface CulturalCalendarProps {
+  compact?: boolean;
+  onViewAll?: () => void;
+}
+
+export default function CulturalCalendar({ compact = false, onViewAll }: CulturalCalendarProps) {
   const [upcomingEvents, setUpcomingEvents] = useState<CulturalEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -118,6 +123,67 @@ export default function CulturalCalendar() {
 
   if (loading || upcomingEvents.length === 0) return null;
 
+  // Compact sidebar version
+  if (compact) {
+    // Show only the most urgent events (within 7 days) or first 2 events
+    const urgentEvents = upcomingEvents.filter(event => getDaysUntil(event.event_date) <= 7);
+    const displayEvents = urgentEvents.length > 0 ? urgentEvents.slice(0, 2) : upcomingEvents.slice(0, 2);
+
+    return (
+      <div className="bg-white border-2 border-purple-200 rounded-xl p-4 mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xl">🗓️</span>
+          <h3 className="text-sm font-bold text-gray-800">Upcoming Events</h3>
+        </div>
+
+        <div className="space-y-2">
+          {displayEvents.map((event) => {
+            const daysUntil = getDaysUntil(event.event_date);
+            const isUrgent = daysUntil <= 7;
+
+            return (
+              <div
+                key={event.id}
+                className={`p-3 rounded-lg border transition-all ${
+                  isUrgent ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-gray-50'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">{getEventIcon(event.event_type)}</span>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-xs text-gray-900 leading-tight mb-1">
+                      {event.title}
+                    </h4>
+                    <p className={`text-xs font-medium ${
+                      isUrgent ? 'text-orange-700' : 'text-purple-700'
+                    }`}>
+                      📅 {formatDate(event.event_date)}
+                    </p>
+                  </div>
+                  {isUrgent && (
+                    <span className="bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold shrink-0">
+                      Soon!
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {upcomingEvents.length > 2 && (
+          <button
+            onClick={onViewAll}
+            className="w-full mt-3 text-xs text-purple-600 hover:text-purple-700 font-semibold flex items-center justify-center gap-1 py-2 hover:bg-purple-50 rounded-lg transition-colors"
+          >
+            View All Events ({upcomingEvents.length}) →
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Full version
   return (
     <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-yellow-50 border-2 border-purple-200 rounded-2xl p-5 mb-6">
       <div className="flex items-center justify-between mb-4">

@@ -124,7 +124,7 @@ export default function SideMenu({
 
           {/* Cultural Calendar */}
           <div className="px-4 pb-4">
-            <CulturalCalendar />
+            <CulturalCalendar compact={true} />
           </div>
 
           {/* Footer Info */}
