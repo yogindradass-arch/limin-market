@@ -437,6 +437,10 @@ export default function App() {
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
+    // Close category view modal if open
+    if (showCategoryView) {
+      setShowCategoryView(false);
+    }
   };
 
   const closeModal = () => {
