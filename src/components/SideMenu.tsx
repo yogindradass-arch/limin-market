@@ -7,9 +7,24 @@ interface SideMenuProps {
   onMyListingsClick?: () => void;
   onDealsClick?: () => void;
   onFreeItemsClick?: () => void;
+  isAdmin?: boolean;
+  pendingReportsCount?: number;
+  onAdminClick?: () => void;
 }
 
-export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClick, onFavoritesClick, onMyListingsClick, onDealsClick, onFreeItemsClick }: SideMenuProps) {
+export default function SideMenu({
+  isOpen,
+  onClose,
+  onAboutClick,
+  onSettingsClick,
+  onFavoritesClick,
+  onMyListingsClick,
+  onDealsClick,
+  onFreeItemsClick,
+  isAdmin = false,
+  pendingReportsCount = 0,
+  onAdminClick
+}: SideMenuProps) {
   if (!isOpen) return null;
 
   const menuSections = [
@@ -27,6 +42,18 @@ export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClic
         { icon: '❤️', label: 'Favorites', action: () => onFavoritesClick?.() },
       ]
     },
+    // Admin section - only show if user is admin
+    ...(isAdmin ? [{
+      title: 'Admin',
+      items: [
+        {
+          icon: '🛡️',
+          label: 'Moderation Dashboard',
+          action: () => onAdminClick?.(),
+          badge: pendingReportsCount > 0 ? pendingReportsCount : undefined
+        },
+      ]
+    }] : []),
     {
       title: 'App',
       items: [
@@ -77,10 +104,15 @@ export default function SideMenu({ isOpen, onClose, onAboutClick, onSettingsClic
                         item.action();
                         onClose();
                       }}
-                      className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left group"
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left group relative"
                     >
                       <span className="text-2xl group-hover:scale-110 transition-transform">{item.icon}</span>
                       <span className="text-gray-800 font-medium">{item.label}</span>
+                      {'badge' in item && item.badge && (
+                        <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>

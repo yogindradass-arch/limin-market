@@ -1516,9 +1516,8 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onSearchClick={() => setShowSearch(true)}
+        onPostClick={() => setShowPostForm(true)}
         unreadMessagesCount={totalUnreadCount}
-        isAdmin={userRole === 'admin'}
-        pendingReportsCount={pendingReportsCount}
       />
       <FAB onClick={() => setShowPostForm(true)} />
 
@@ -1669,6 +1668,12 @@ export default function App() {
         onSettingsClick={() => {
           setShowMenu(false);
           setShowSettings(true);
+        }}
+        isAdmin={userRole === 'admin'}
+        pendingReportsCount={pendingReportsCount}
+        onAdminClick={() => {
+          setShowMenu(false);
+          setActiveTab('admin');
         }}
       />
 
