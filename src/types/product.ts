@@ -63,4 +63,15 @@ export interface Product {
   sendHomeCarrier?: string;  // Shipping carrier (FedEx, DHL, USPS, etc.)
   sendHomeDeliveryTime?: string;  // Estimated delivery time (e.g., "5-7 days")
   sendHomeDestinations?: string[];  // Available shipping destinations
+  // Comprehensive shipping fields
+  canShipToGuyana?: boolean;  // Can ship to Guyana specifically
+  canShipLocal?: boolean;  // Local pickup/delivery
+  canShipInternational?: boolean;  // International shipping
+  shippingCost?: number;  // Shipping cost
+  estimatedShippingDays?: number;  // Estimated delivery days
+  shippingMethod?: 'pickup' | 'meetup' | 'cargo' | 'courier';
+  cargoCompany?: string;  // EZShip, Guyana Cargo Express, etc.
+  packageWeight?: number;  // Package weight in kg
+  packageDimensions?: string;  // "24x18x12 inches"
+  shippingNotes?: string;  // Additional shipping information
 }

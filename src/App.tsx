@@ -926,6 +926,7 @@ export default function App() {
       filtered = filtered.filter(p => showFreeOnly ? (p.price >= 0 && p.price < 50) : (p.price > 0 && p.price < 50));
     }
     if (activeFilter === 'Wholesale') filtered = filtered.filter(p => p.listingType === 'wholesale');
+    if (activeFilter === 'Ships to Guyana 🇬🇾') filtered = filtered.filter(p => p.canShipToGuyana === true);
 
     // Apply advanced filters
     if (advancedFilters.categories.length > 0) {

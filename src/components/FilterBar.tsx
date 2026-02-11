@@ -3,7 +3,7 @@ interface FilterBarProps {
   onFilterChange: (filter: string) => void;
 }
 
-const filters = ['All', 'Wanted', 'Nearby', 'Real Estate', 'Vehicles', 'Jobs', 'Services', 'Under $50', 'Wholesale'];
+const filters = ['All', 'Wanted', 'Nearby', 'Ships to Guyana 🇬🇾', 'Real Estate', 'Vehicles', 'Jobs', 'Services', 'Under $50', 'Wholesale'];
 
 export default function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
   return (

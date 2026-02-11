@@ -67,6 +67,14 @@ export interface ListingFormData {
   sendHomeCarrier?: string;
   sendHomeDeliveryTime?: string;
   sendHomeDestinations?: string[];
+  // Ship to Guyana fields
+  canShipToGuyana?: boolean;
+  cargoCompany?: string;
+  shippingMethod?: 'pickup' | 'meetup' | 'cargo' | 'courier';
+  shippingCost?: number;
+  packageWeight?: number;
+  estimatedShippingDays?: number;
+  shippingNotes?: string;
 }
 
 const categories = [
@@ -1272,6 +1280,164 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                     <div className="p-3 bg-blue-100 rounded-lg">
                       <p className="text-xs text-blue-800">
                         <strong>💡 Tip:</strong> Items with "Send Home" shipping are displayed to diaspora buyers in USD and include international shipping options.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Ship to Guyana - Cargo/Barrel Shipping */}
+            {formData.category && !['Jobs', 'Services', 'Real Estate'].includes(formData.category) && (
+              <div className="space-y-4 p-4 bg-gradient-to-br from-green-50 to-yellow-50 rounded-lg border-2 border-green-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                      <span className="text-xl">🇺🇸→🇬🇾</span> Ship to Guyana
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1">Can ship this item to Guyana via cargo/barrel</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.canShipToGuyana || false}
+                      onChange={(e) => setFormData(prev => ({ ...prev, canShipToGuyana: e.target.checked }))}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                  </label>
+                </div>
+
+                {formData.canShipToGuyana && (
+                  <div className="space-y-4 pt-3 border-t border-green-200">
+                    {/* Cargo Company */}
+                    <div>
+                      <label htmlFor="cargoCompany" className="block text-sm font-medium text-gray-700 mb-2">
+                        Cargo/Shipping Company
+                      </label>
+                      <select
+                        id="cargoCompany"
+                        value={formData.cargoCompany || ''}
+                        onChange={(e) => handleChange('cargoCompany', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      >
+                        <option value="">Select company</option>
+                        <option value="EZShip Guyana">EZShip Guyana</option>
+                        <option value="Guyana Cargo Express">Guyana Cargo Express</option>
+                        <option value="Caribbean Freight">Caribbean Freight</option>
+                        <option value="Takealong Freight">Takealong Freight</option>
+                        <option value="Crown Shipping">Crown Shipping</option>
+                        <option value="Laparkan">Laparkan</option>
+                        <option value="Other">Other / Buyer arranges</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Popular cargo companies serving Guyana
+                      </p>
+                    </div>
+
+                    {/* Shipping Method */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Shipping Method
+                      </label>
+                      <div className="space-y-2">
+                        {[
+                          { value: 'cargo', label: '🛢️ Cargo/Barrel', desc: 'Ship via barrel service' },
+                          { value: 'courier', label: '✈️ Air Courier', desc: 'Faster air shipping' },
+                          { value: 'meetup', label: '🤝 Hand Carry', desc: 'Someone traveling can carry' }
+                        ].map(method => (
+                          <label key={method.value} className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50 transition-colors">
+                            <input
+                              type="radio"
+                              name="shippingMethod"
+                              value={method.value}
+                              checked={formData.shippingMethod === method.value}
+                              onChange={(e) => handleChange('shippingMethod', e.target.value)}
+                              className="h-4 w-4 text-green-600 focus:ring-green-500"
+                            />
+                            <div>
+                              <span className="text-sm font-medium">{method.label}</span>
+                              <p className="text-xs text-gray-600">{method.desc}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Shipping Cost */}
+                    <div>
+                      <label htmlFor="shippingCost" className="block text-sm font-medium text-gray-700 mb-2">
+                        Estimated Shipping Cost (USD)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-2 text-gray-500">$</span>
+                        <input
+                          type="number"
+                          id="shippingCost"
+                          value={formData.shippingCost || 0}
+                          onChange={(e) => handleChange('shippingCost', parseFloat(e.target.value) || 0)}
+                          className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="0.00"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formData.shippingCost === 0 ? 'Buyer arranges/pays shipping' : `Approximately $${formData.shippingCost?.toFixed(2) || '0.00'} USD`}
+                      </p>
+                    </div>
+
+                    {/* Package Details */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label htmlFor="packageWeight" className="block text-sm font-medium text-gray-700 mb-2">
+                          Weight (lbs)
+                        </label>
+                        <input
+                          type="number"
+                          id="packageWeight"
+                          value={formData.packageWeight || ''}
+                          onChange={(e) => handleChange('packageWeight', parseFloat(e.target.value) || 0)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="Weight"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="estimatedShippingDays" className="block text-sm font-medium text-gray-700 mb-2">
+                          Est. Days
+                        </label>
+                        <input
+                          type="number"
+                          id="estimatedShippingDays"
+                          value={formData.estimatedShippingDays || ''}
+                          onChange={(e) => handleChange('estimatedShippingDays', parseInt(e.target.value) || 0)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="Days"
+                          min="1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Shipping Notes */}
+                    <div>
+                      <label htmlFor="shippingNotes" className="block text-sm font-medium text-gray-700 mb-2">
+                        Shipping Notes (optional)
+                      </label>
+                      <textarea
+                        id="shippingNotes"
+                        value={formData.shippingNotes || ''}
+                        onChange={(e) => handleChange('shippingNotes', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="E.g., Fragile items, requires special handling, etc."
+                        rows={2}
+                      />
+                    </div>
+
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <p className="text-xs text-green-800">
+                        <strong>💡 Tip:</strong> Items marked "Can Ship to Guyana" will be prominently displayed to diaspora buyers looking to send items home. Include weight and dimensions for accurate cargo quotes!
                       </p>
                     </div>
                   </div>
