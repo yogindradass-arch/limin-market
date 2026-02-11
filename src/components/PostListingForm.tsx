@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { uploadProductImageLegacy as uploadProductImage } from '../lib/imageUpload';
+import { uploadProductImage, type ImageVariants } from '../lib/imageUpload';
 import { moderateListing } from '../lib/contentModeration';
 import { moderateImage } from '../lib/imageModeration';
 
@@ -8,6 +8,13 @@ interface PostListingFormProps {
   onSubmit: (listing: ListingFormData, productId?: string) => void;
   initialData?: ListingFormData;
   productId?: string;
+}
+
+interface ImageUploadProgress {
+  stage: 'validating' | 'compressing' | 'uploading' | 'complete';
+  variant?: 'thumb' | 'medium' | 'full' | 'original';
+  progress: number;
+  imageIndex: number;
 }
 
 export interface ListingFormData {
@@ -21,6 +28,7 @@ export interface ListingFormData {
   listingMode?: 'offering' | 'seeking';  // Whether offering or seeking
   image: string;
   images?: string[];  // Array of all uploaded image URLs
+  imageVariants?: ImageVariants[];  // Array of optimized image variants for each image
   // Real Estate fields
   bedrooms?: number;
   bathrooms?: number;
@@ -133,6 +141,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
   );
   const [uploadingImage, setUploadingImage] = useState(false);
   const [checkingImage, setCheckingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<ImageUploadProgress | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,25 +187,34 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       return defaultImages[category] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500';
     };
 
-    // Upload images if files were selected
+    // Upload images if files were selected with optimization
     let imageUrl = formData.image;
     let uploadedImages: string[] = [];
+    let imageVariants: ImageVariants[] = [];
 
     if (imageFiles.length > 0) {
       setUploadingImage(true);
 
-      // Upload all selected images
-      for (const file of imageFiles) {
-        const { url, error } = await uploadProductImage(file);
+      // Upload all selected images with optimization and progress tracking
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+
+        const { variants, error } = await uploadProductImage(file, (progress) => {
+          setUploadProgress({ ...progress, imageIndex: i });
+        });
 
         if (error) {
           setUploadingImage(false);
+          setUploadProgress(null);
           setErrors(prev => ({ ...prev, image: error }));
           return;
         }
 
-        if (url) {
-          uploadedImages.push(url);
+        if (variants) {
+          // Store all variants
+          imageVariants.push(variants);
+          // Use medium variant as the primary URL for backwards compatibility
+          uploadedImages.push(variants.medium);
         }
       }
 
@@ -206,6 +224,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       }
 
       setUploadingImage(false);
+      setUploadProgress(null);
     }
 
     // Use default image if no image was uploaded for Jobs/Services
@@ -218,6 +237,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       price: isFree ? 0 : formData.price,
       image: imageUrl,
       images: uploadedImages.length > 0 ? uploadedImages : (formData.images || [imageUrl]),
+      imageVariants: imageVariants.length > 0 ? imageVariants : formData.imageVariants,
     }, productId);
   };
 
@@ -1317,8 +1337,10 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
               >
                 {checkingImage
                   ? 'Checking Image...'
+                  : uploadingImage && uploadProgress
+                  ? `${uploadProgress.stage === 'validating' ? 'Validating' : uploadProgress.stage === 'compressing' ? `Compressing ${uploadProgress.variant}` : uploadProgress.stage === 'uploading' ? `Uploading ${uploadProgress.variant}` : 'Processing'}... ${Math.round(uploadProgress.progress)}%`
                   : uploadingImage
-                  ? 'Uploading Image...'
+                  ? 'Uploading Images...'
                   : (isEditMode ? 'Update Listing' : 'Post Listing')}
               </button>
             </div>

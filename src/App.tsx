@@ -258,6 +258,7 @@ export default function App() {
             listingMode: (item.listing_mode as 'offering' | 'seeking') || 'offering',
             image: item.image_url,
             images: item.images || [item.image_url],
+            imageVariants: item.image_variants?.[0] || undefined, // First image's variants for ProductCard thumb
             isFavorited: false,
             rating: 0, // Can be calculated later based on reviews
             timeAgo,
@@ -468,6 +469,7 @@ export default function App() {
             listing_mode: listingData.listingMode || 'offering',
             image_url: listingData.image || null,
             images: listingData.images || (listingData.image ? [listingData.image] : []),
+            image_variants: listingData.imageVariants || null,
             is_active: true,
             seller_id: user.id,
             status: 'active',
@@ -578,6 +580,7 @@ export default function App() {
           listing_mode: listing.listingMode || 'offering',
           image_url: listing.image,
           images: listing.images || [listing.image],
+          image_variants: listing.imageVariants || null,
           // Real Estate fields
           bedrooms: listing.bedrooms,
           bathrooms: listing.bathrooms,
@@ -1163,24 +1166,10 @@ export default function App() {
       );
     }
 
+    // Messages tab is handled by MessagesModal component (rendered below at line 1739)
+    // No need for separate tab content since modal overlays the entire screen
     if (activeTab === 'messages') {
-      return (
-        <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-          <div className="w-24 h-24 bg-limin-primary/10 rounded-full flex items-center justify-center mb-6">
-            <svg className="w-12 h-12 text-limin-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-limin-dark mb-2">No Messaging System</h2>
-          <p className="text-gray-600 mb-6">Limin Market uses direct phone contact. Click any product to see the seller's phone number and call them directly!</p>
-          <button
-            onClick={() => setActiveTab('home')}
-            className="px-6 py-3 bg-limin-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
-          >
-            Browse Products
-          </button>
-        </div>
-      );
+      return null; // MessagesModal will handle the display
     }
 
     if (activeTab === 'favorites') {
