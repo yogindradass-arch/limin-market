@@ -30,6 +30,7 @@ import CategoryViewModal from './components/CategoryViewModal';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
+import { detectLocation, saveManualLocation } from './lib/locationDetection';
 import type { Product } from './types/product';
 import type { Conversation } from './types/messages';
 import type { SearchFilters } from './types/search';
@@ -84,6 +85,16 @@ export default function App() {
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Detect location on mount
+  useEffect(() => {
+    async function autoDetectLocation() {
+      const result = await detectLocation();
+      setCurrentLocation(result.location);
+      console.log(`Location detected via ${result.method}:`, result.location);
+    }
+    autoDetectLocation();
+  }, []);
 
   // Check for password recovery on mount
   useEffect(() => {
@@ -883,6 +894,12 @@ export default function App() {
       console.error('Error handling contact seller:', error);
       alert('Failed to contact seller. Please try again.');
     }
+  };
+
+  const handleLocationChange = (location: string) => {
+    setCurrentLocation(location);
+    saveManualLocation(location);
+    console.log('Location manually changed to:', location);
   };
 
   // All products for search (from Supabase)
@@ -1687,7 +1704,7 @@ export default function App() {
         isOpen={showLocationSelector}
         onClose={() => setShowLocationSelector(false)}
         currentLocation={currentLocation}
-        onSelectLocation={setCurrentLocation}
+        onSelectLocation={handleLocationChange}
       />
 
       <AboutModal
