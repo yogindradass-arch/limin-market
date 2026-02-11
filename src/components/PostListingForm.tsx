@@ -471,6 +471,79 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                 Description *
               </label>
+
+              {/* Description Tips */}
+              {formData.category && (
+                <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900 mb-1">💡 Tips for a great description:</p>
+                      <ul className="text-xs text-blue-800 space-y-1">
+                        {formData.category === 'Electronics' && (
+                          <>
+                            <li>• Mention condition, brand, model, and storage/specs</li>
+                            <li>• Include what's in the box (charger, cables, box, etc.)</li>
+                            <li>• Battery health for phones/laptops</li>
+                            <li>• Any scratches, dents, or issues</li>
+                          </>
+                        )}
+                        {formData.category === 'Vehicles' && (
+                          <>
+                            <li>• Year, make, model, mileage, transmission</li>
+                            <li>• Recent maintenance or repairs</li>
+                            <li>• Accident history, rust, mechanical issues</li>
+                            <li>• Papers up to date, fitness certificate</li>
+                          </>
+                        )}
+                        {formData.category === 'Real Estate' && (
+                          <>
+                            <li>• Number of bedrooms, bathrooms, square footage</li>
+                            <li>• Recent renovations or upgrades</li>
+                            <li>• Nearby amenities (schools, shops, transport)</li>
+                            <li>• Property title, occupancy status</li>
+                          </>
+                        )}
+                        {formData.category === 'Fashion' && (
+                          <>
+                            <li>• Brand, size, color, material</li>
+                            <li>• Condition (new with tags, gently used, etc.)</li>
+                            <li>• Measurements if possible</li>
+                            <li>• Any flaws, stains, or alterations</li>
+                          </>
+                        )}
+                        {formData.category === 'Jobs' && (
+                          <>
+                            <li>• Job responsibilities and requirements</li>
+                            <li>• Work schedule and location</li>
+                            <li>• Experience level needed</li>
+                            <li>• Benefits and growth opportunities</li>
+                          </>
+                        )}
+                        {formData.category === 'Services' && (
+                          <>
+                            <li>• What's included in the service</li>
+                            <li>• Your experience and qualifications</li>
+                            <li>• Service area and availability</li>
+                            <li>• Response time and booking process</li>
+                          </>
+                        )}
+                        {!['Electronics', 'Vehicles', 'Real Estate', 'Fashion', 'Jobs', 'Services'].includes(formData.category) && (
+                          <>
+                            <li>• Condition (new, like new, good, fair)</li>
+                            <li>• What's included</li>
+                            <li>• Any defects or issues</li>
+                            <li>• Why you're selling</li>
+                          </>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <textarea
                 id="description"
                 value={formData.description}
