@@ -6,6 +6,8 @@ import ShareButton from './ShareButton';
 import WhatsAppShareButton from './WhatsAppShareButton';
 import ReviewSubmissionModal from './ReviewSubmissionModal';
 import ReviewsList from './ReviewsList';
+import SafeMeetingLocations from './SafeMeetingLocations';
+import VerificationBadges from './VerificationBadges';
 import { supabase } from '../lib/supabase';
 
 interface ProductDetailModalProps {
@@ -572,6 +574,19 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                         <span>Verified Seller • No reviews yet</span>
                       </div>
                     )}
+
+                    {/* Verification Badges */}
+                    <div className="mt-2">
+                      <VerificationBadges
+                        phoneVerified={true}
+                        emailVerified={true}
+                        idVerified={false}
+                        businessVerified={false}
+                        size="small"
+                        showLabels={true}
+                        layout="horizontal"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -668,6 +683,11 @@ export default function ProductDetailModal({ product, isOpen, onClose, onFavorit
                       </svg>
                       Report Listing
                     </button>
+
+                    {/* Safe Meeting Locations */}
+                    <div className="mt-4">
+                      <SafeMeetingLocations userCity={product.location.split(',')[0].trim()} compact={true} />
+                    </div>
                   </div>
                 )}
 

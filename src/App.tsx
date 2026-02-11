@@ -27,6 +27,7 @@ import AdminModerationDashboard from './components/AdminModerationDashboard';
 import HeroSection from './components/HeroSection';
 import TrendingSection from './components/TrendingSection';
 import CategoryViewModal from './components/CategoryViewModal';
+import CulturalCalendar from './components/CulturalCalendar';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -1330,6 +1331,13 @@ export default function App() {
             onProductClick={handleProductClick}
             currency={currency}
           />
+        )}
+
+        {/* Cultural Calendar */}
+        {!selectedCategory && (
+          <div className="px-4 pt-4">
+            <CulturalCalendar />
+          </div>
         )}
 
         {/* Category Filter Banner */}
