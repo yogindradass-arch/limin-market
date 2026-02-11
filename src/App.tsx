@@ -27,6 +27,8 @@ import AdminModerationDashboard from './components/AdminModerationDashboard';
 import HeroSection from './components/HeroSection';
 import TrendingSection from './components/TrendingSection';
 import CategoryViewModal from './components/CategoryViewModal';
+import ToastContainer from './components/ToastContainer';
+import type { ToastProps } from './components/Toast';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -82,9 +84,22 @@ export default function App() {
   const [showCategoryView, setShowCategoryView] = useState(false);
   const [currentViewCategory, setCurrentViewCategory] = useState<string>('');
 
+  // Toast notifications state
+  const [toasts, setToasts] = useState<Omit<ToastProps, 'onClose'>[]>([]);
+
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Toast helper function
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, message, type }]);
+  };
+
+  const closeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   // Detect location on mount
   useEffect(() => {
@@ -410,18 +425,18 @@ export default function App() {
           .eq('product_id', id);
 
         if (error) throw error;
+        showToast('Removed from favorites');
       } else {
         // Add to favorites
         const { error } = await supabase
           .from('favorites')
           .insert({ user_id: user.id, product_id: id });
 
-        if (!error) {
-          // Track favorite event
-          trackEvent('favorite', id, user.id);
-        }
-
         if (error) throw error;
+
+        // Track favorite event
+        trackEvent('favorite', id, user.id);
+        showToast('❤️ Added to favorites');
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -431,7 +446,7 @@ export default function App() {
         isFavorited ? n.add(id) : n.delete(id);
         return n;
       });
-      alert('Failed to update favorite. Please try again.');
+      showToast('Failed to update favorite', 'error');
     }
   };
 
@@ -534,29 +549,22 @@ export default function App() {
 
       if (error) {
         console.error('Error posting listing:', error);
-        alert('Failed to post listing. Please try again.');
+        showToast('Failed to post listing', 'error');
         return;
       }
 
       if (data) {
         console.log('✅ Listing posted successfully:', data);
-        console.log('📝 New listing details:', {
-          title: data[0]?.title,
-          price: data[0]?.price,
-          category: data[0]?.category,
-          id: data[0]?.id
-        });
-        alert('Listing posted successfully!');
+        showToast('✓ Listing posted successfully!');
         setShowPostForm(false);
         // Reset filter to "All" so user can see their new listing
         setActiveFilter('All');
         // Refresh products list
-        console.log('🔄 Refreshing products list...');
         await fetchProducts();
       }
     } catch (error) {
       console.error('Error posting listing:', error);
-      alert('Failed to post listing. Please try again.');
+      showToast('Failed to post listing', 'error');
     }
   };
 
@@ -724,19 +732,19 @@ export default function App() {
 
       if (error) {
         console.error('Error deleting listing:', error);
-        alert('Failed to delete listing. Please try again.');
+        showToast('Failed to delete listing', 'error');
         return;
       }
 
       console.log('✅ Product deleted:', productId);
-      alert('Listing deleted successfully!');
+      showToast('✓ Listing deleted successfully');
       // Close modal first
       closeModal();
       // Refresh products list
       await fetchProducts();
     } catch (error) {
       console.error('Error deleting listing:', error);
-      alert('Failed to delete listing. Please try again.');
+      showToast('Failed to delete listing', 'error');
     }
   };
 
@@ -1826,6 +1834,9 @@ export default function App() {
         onFavoriteToggle={toggleFav}
         currency={currency}
       />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onClose={closeToast} />
     </div>
   );
 }
