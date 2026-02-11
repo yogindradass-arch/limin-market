@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { uploadProductImage, type ImageVariants } from '../lib/imageUpload';
 import { moderateListing } from '../lib/contentModeration';
 import { moderateImage } from '../lib/imageModeration';
-import { supabase } from '../lib/supabase';
 
 interface PostListingFormProps {
   onClose: () => void;
@@ -144,7 +143,6 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
   const [uploadingImage, setUploadingImage] = useState(false);
   const [checkingImage, setCheckingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<ImageUploadProgress | null>(null);
-  const [generatingDescription, setGeneratingDescription] = useState(false);
 
   // Ref for camera input to auto-trigger it
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -158,70 +156,6 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
       }, 300);
     }
   }, [autoOpenCamera, isEditMode]);
-
-  const handleGenerateDescription = async () => {
-    // Check if we have required data
-    if (!formData.title.trim()) {
-      setErrors(prev => ({ ...prev, description: 'Please enter a title first' }));
-      return;
-    }
-
-    if (!formData.category) {
-      setErrors(prev => ({ ...prev, description: 'Please select a category first' }));
-      return;
-    }
-
-    setGeneratingDescription(true);
-    setErrors(prev => ({ ...prev, description: '' }));
-
-    try {
-      // Convert image to base64 if available
-      let imageBase64 = '';
-      if (imageFiles.length > 0) {
-        const reader = new FileReader();
-        imageBase64 = await new Promise<string>((resolve, reject) => {
-          reader.onloadend = () => {
-            const base64 = reader.result as string;
-            // Remove data:image/...;base64, prefix
-            resolve(base64.split(',')[1]);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(imageFiles[0]);
-        });
-      }
-
-      // Call the edge function
-      const { data, error } = await supabase.functions.invoke('generate-description', {
-        body: {
-          imageBase64: imageBase64 || undefined,
-          imageUrl: imagePreviews[0] || undefined,
-          title: formData.title,
-          category: formData.category,
-          location: formData.location,
-          price: formData.price,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data && data.description) {
-        // Set the generated description
-        setFormData(prev => ({ ...prev, description: data.description }));
-      } else {
-        throw new Error('No description generated');
-      }
-    } catch (error) {
-      console.error('Error generating description:', error);
-      setErrors(prev => ({
-        ...prev,
-        description: error instanceof Error ? error.message : 'Failed to generate description. Please try again.',
-      }));
-    } finally {
-      setGeneratingDescription(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -534,34 +468,9 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
 
             {/* Description */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Description *
-                </label>
-                <button
-                  type="button"
-                  onClick={handleGenerateDescription}
-                  disabled={generatingDescription || !formData.title || !formData.category}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-limin-primary bg-limin-primary/10 rounded-lg hover:bg-limin-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {generatingDescription ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>Generating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <span>✨ Generate with AI</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+              </label>
               <textarea
                 id="description"
                 value={formData.description}
