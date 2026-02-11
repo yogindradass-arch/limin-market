@@ -317,9 +317,10 @@ export default function App() {
   };
 
   // Categorize products
-  const hotDeals = products.filter(p => p.price > 0 && p.price < 100);
-  const dollarItems = products.filter(p => p.price > 0 && p.price <= 50);
-  const freeItems = products.filter(p => p.price === 0);
+  const hotDeals = products.filter(p => p.price > 0 && p.price < 100 && p.listingMode !== 'seeking');
+  const dollarItems = products.filter(p => p.price > 0 && p.price <= 50 && p.listingMode !== 'seeking');
+  // Free items should only include items being offered for free, not "wanted" listings with negotiable budget
+  const freeItems = products.filter(p => p.price === 0 && p.listingMode !== 'seeking');
 
   // Fetch favorites from database
   const fetchFavorites = async () => {
