@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { uploadProductImage, type ImageVariants } from '../lib/imageUpload';
 import { moderateListing } from '../lib/contentModeration';
 import { moderateImage } from '../lib/imageModeration';
@@ -8,6 +8,7 @@ interface PostListingFormProps {
   onSubmit: (listing: ListingFormData, productId?: string) => void;
   initialData?: ListingFormData;
   productId?: string;
+  autoOpenCamera?: boolean;
 }
 
 interface ImageUploadProgress {
@@ -116,7 +117,7 @@ const locations = [
   'Other',
 ];
 
-export default function PostListingForm({ onClose, onSubmit, initialData, productId }: PostListingFormProps) {
+export default function PostListingForm({ onClose, onSubmit, initialData, productId, autoOpenCamera = false }: PostListingFormProps) {
   const isEditMode = !!initialData;
 
   const [formData, setFormData] = useState<ListingFormData>(
@@ -142,6 +143,19 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
   const [uploadingImage, setUploadingImage] = useState(false);
   const [checkingImage, setCheckingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<ImageUploadProgress | null>(null);
+
+  // Ref for camera input to auto-trigger it
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-open camera when opened from camera button
+  useEffect(() => {
+    if (autoOpenCamera && !isEditMode && cameraInputRef.current) {
+      // Small delay to ensure the modal is fully rendered
+      setTimeout(() => {
+        cameraInputRef.current?.click();
+      }, 300);
+    }
+  }, [autoOpenCamera, isEditMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1292,6 +1306,7 @@ export default function PostListingForm({ onClose, onSubmit, initialData, produc
                       <span className="font-semibold text-limin-primary">📸 Take Photo</span>
                     </div>
                     <input
+                      ref={cameraInputRef}
                       type="file"
                       className="hidden"
                       accept="image/*"

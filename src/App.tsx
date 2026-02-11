@@ -44,6 +44,7 @@ export default function App() {
   const [viewingSellerId, setViewingSellerId] = useState<string | null>(null);
   const [viewingSellerName, setViewingSellerName] = useState<string>('');
   const [showPostForm, setShowPostForm] = useState(false);
+  const [autoOpenCamera, setAutoOpenCamera] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -1516,7 +1517,10 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onSearchClick={() => setShowSearch(true)}
-        onPostClick={() => setShowPostForm(true)}
+        onPostClick={() => {
+          setAutoOpenCamera(true);
+          setShowPostForm(true);
+        }}
         unreadMessagesCount={totalUnreadCount}
       />
       <FAB onClick={() => setShowPostForm(true)} />
@@ -1601,6 +1605,7 @@ export default function App() {
           onClose={() => {
             setShowPostForm(false);
             setEditingProduct(null);
+            setAutoOpenCamera(false);
           }}
           onSubmit={editingProduct ? handleUpdateListing : handlePostListing}
           initialData={editingProduct ? {
@@ -1616,6 +1621,7 @@ export default function App() {
             images: editingProduct.images || [editingProduct.image],
           } : undefined}
           productId={editingProduct?.id}
+          autoOpenCamera={autoOpenCamera}
         />
       )}
 
