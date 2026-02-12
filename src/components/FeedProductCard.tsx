@@ -81,8 +81,8 @@ export default function FeedProductCard({
         {/* Top section - Category badge */}
         <div className="flex justify-between items-start pt-12">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-full">
-            <span className="text-lg">{getCategoryIcon(product.category)}</span>
-            <span className="text-sm font-medium">{product.category}</span>
+            <span className="text-lg">{getCategoryIcon(product.category || 'Other')}</span>
+            <span className="text-sm font-medium">{product.category || 'Other'}</span>
           </div>
 
           {product.listingType && (
@@ -124,30 +124,32 @@ export default function FeedProductCard({
               <span>{product.location || 'Unknown'}</span>
             </div>
 
-            {product.condition && (
+            {product.vehicleCondition && (
               <div className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>{product.condition}</span>
+                <span>{product.vehicleCondition}</span>
               </div>
             )}
 
-            <div className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{new Date(product.created_at).toLocaleDateString()}</span>
-            </div>
+            {product.createdAt && (
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{new Date(product.createdAt).toLocaleDateString()}</span>
+              </div>
+            )}
           </div>
 
           {/* Seller info */}
           <div className="flex items-center gap-3 pt-2">
             <div className="w-10 h-10 bg-gradient-to-br from-limin-primary to-limin-secondary rounded-full flex items-center justify-center text-white font-bold">
-              {product.seller_name?.charAt(0).toUpperCase() || 'U'}
+              {product.seller?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div>
-              <p className="font-semibold">{product.seller_name || 'Anonymous'}</p>
+              <p className="font-semibold">{product.seller || 'Anonymous'}</p>
               <p className="text-xs text-white/60">Seller</p>
             </div>
           </div>
