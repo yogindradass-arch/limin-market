@@ -165,8 +165,8 @@ export default function StoryCreator({ isOpen, onClose, onSuccess }: StoryCreato
             </button>
           </div>
 
-          {/* Story Preview */}
-          <div className="flex-1 flex items-center justify-center bg-black relative">
+          {/* Story Preview - with fixed bottom space */}
+          <div className="flex-1 flex items-center justify-center bg-black relative overflow-hidden" style={{ maxHeight: 'calc(100vh - 180px)' }}>
             {selectedFile?.type.startsWith('image/') ? (
               <img
                 src={previewUrl}
@@ -183,7 +183,7 @@ export default function StoryCreator({ isOpen, onClose, onSuccess }: StoryCreato
 
             {/* Caption overlay */}
             {caption && (
-              <div className="absolute bottom-32 left-0 right-0 px-6">
+              <div className="absolute bottom-4 left-0 right-0 px-6">
                 <div className="bg-black/60 backdrop-blur-sm px-5 py-3 rounded-xl">
                   <p className="text-white text-center">{caption}</p>
                 </div>
@@ -191,8 +191,8 @@ export default function StoryCreator({ isOpen, onClose, onSuccess }: StoryCreato
             )}
           </div>
 
-          {/* Bottom controls */}
-          <div className="bg-black/50 backdrop-blur-md p-4 space-y-3 border-t border-white/10">
+          {/* Bottom controls - always visible */}
+          <div className="bg-black/50 backdrop-blur-md p-4 space-y-3 border-t border-white/10 shrink-0">
             {/* Caption input */}
             <div className="relative">
               <input
