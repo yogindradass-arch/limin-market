@@ -31,6 +31,7 @@ import ToastContainer from './components/ToastContainer';
 import type { ToastProps } from './components/Toast';
 import StoriesBar from './components/StoriesBar';
 import StoryCreator from './components/StoryCreator';
+import SocialFeedView from './components/SocialFeedView';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -91,6 +92,9 @@ export default function App() {
 
   // Stories state
   const [showStoryCreator, setShowStoryCreator] = useState(false);
+
+  // Social Feed state
+  const [showSocialFeed, setShowSocialFeed] = useState(false);
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -1561,6 +1565,7 @@ export default function App() {
           setAutoOpenCamera(true);
           setShowPostForm(true);
         }}
+        onFeedClick={() => setShowSocialFeed(true)}
         unreadMessagesCount={totalUnreadCount}
       />
       <FAB onClick={() => setShowPostForm(true)} />
@@ -1854,6 +1859,21 @@ export default function App() {
             setShowStoryCreator(false);
             showToast('✨ Story posted successfully!', 'success');
           }}
+        />
+      )}
+
+      {/* Social Feed View */}
+      {showSocialFeed && (
+        <SocialFeedView
+          products={products.filter(p => p.status === 'active')}
+          onClose={() => setShowSocialFeed(false)}
+          onFavorite={(productId) => toggleFav(productId)}
+          onContactSeller={(product) => {
+            if (product.sellerId) {
+              handleContactSeller(product.id, product.sellerId);
+            }
+          }}
+          favorites={Array.from(favorites)}
         />
       )}
 

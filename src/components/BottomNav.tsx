@@ -3,6 +3,7 @@ interface BottomNavProps {
   onTabChange: (tab: string) => void;
   onSearchClick?: () => void;
   onPostClick?: () => void;
+  onFeedClick?: () => void;
   unreadMessagesCount?: number;
 }
 
@@ -11,11 +12,12 @@ export default function BottomNav({
   onTabChange,
   onSearchClick,
   onPostClick,
+  onFeedClick,
   unreadMessagesCount = 0,
 }: BottomNavProps) {
   const tabs = [
     { id: 'home', label: 'Home', icon: HomeIcon },
-    { id: 'search', label: 'Search', icon: SearchIcon },
+    { id: 'feed', label: 'Feed', icon: FeedIcon },
     { id: 'post', label: 'Post', icon: CameraIcon }, // New camera/post button
     { id: 'messages', label: 'Messages', icon: MessagesIcon, badge: unreadMessagesCount },
     { id: 'account', label: 'Account', icon: AccountIcon },
@@ -36,6 +38,8 @@ export default function BottomNav({
                   onSearchClick?.();
                 } else if (tab.id === 'post') {
                   onPostClick?.();
+                } else if (tab.id === 'feed') {
+                  onFeedClick?.();
                 } else {
                   onTabChange(tab.id);
                 }
@@ -153,6 +157,24 @@ function CameraIcon({ isActive }: { isActive: boolean }) {
         strokeLinejoin="round"
         strokeWidth={2}
         d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  );
+}
+
+function FeedIcon({ isActive }: { isActive: boolean }) {
+  return (
+    <svg
+      className={`w-6 h-6 ${isActive ? 'text-limin-primary' : 'text-gray-600'}`}
+      fill={isActive ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
       />
     </svg>
   );
