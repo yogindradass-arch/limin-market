@@ -29,6 +29,8 @@ import TrendingSection from './components/TrendingSection';
 import CategoryViewModal from './components/CategoryViewModal';
 import ToastContainer from './components/ToastContainer';
 import type { ToastProps } from './components/Toast';
+import StoriesBar from './components/StoriesBar';
+import StoryCreator from './components/StoryCreator';
 import { supabase } from './lib/supabase';
 import { useAuth } from './context/AuthContext';
 import { trackEvent } from './lib/analytics';
@@ -86,6 +88,9 @@ export default function App() {
 
   // Toast notifications state
   const [toasts, setToasts] = useState<Omit<ToastProps, 'onClose'>[]>([]);
+
+  // Stories state
+  const [showStoryCreator, setShowStoryCreator] = useState(false);
 
   // Products state - fetched from Supabase
   const [products, setProducts] = useState<Product[]>([]);
@@ -1326,6 +1331,11 @@ export default function App() {
 
     return (
       <>
+        {/* Stories Bar */}
+        {!selectedCategory && (
+          <StoriesBar onCreateStory={() => setShowStoryCreator(true)} />
+        )}
+
         {/* Hero Section */}
         {!selectedCategory && (
           <HeroSection
@@ -1834,6 +1844,18 @@ export default function App() {
         onFavoriteToggle={toggleFav}
         currency={currency}
       />
+
+      {/* Story Creator */}
+      {showStoryCreator && (
+        <StoryCreator
+          isOpen={showStoryCreator}
+          onClose={() => setShowStoryCreator(false)}
+          onSuccess={() => {
+            setShowStoryCreator(false);
+            showToast('✨ Story posted successfully!', 'success');
+          }}
+        />
+      )}
 
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onClose={closeToast} />
