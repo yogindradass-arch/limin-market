@@ -85,11 +85,11 @@ export default function FeedProductCard({
             <span className="text-sm font-medium">{product.category}</span>
           </div>
 
-          {product.listing_type && (
+          {product.listingType && (
             <div className="px-3 py-1.5 bg-limin-primary/90 backdrop-blur-md rounded-full">
               <span className="text-xs font-bold uppercase">
-                {product.listing_type === 'wholesale' ? '📦 Wholesale' :
-                 product.listing_type === 'local' ? '📍 Local Only' : '✨ Standard'}
+                {product.listingType === 'wholesale' ? '📦 Wholesale' :
+                 product.listingType === 'local' ? '📍 Local Only' : '✨ Standard'}
               </span>
             </div>
           )}
@@ -116,15 +116,13 @@ export default function FeedProductCard({
 
           {/* Metadata row */}
           <div className="flex items-center gap-4 text-sm text-white/70">
-            {product.location && (
-              <div className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>{product.location}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>{product.location || 'Unknown'}</span>
+            </div>
 
             {product.condition && (
               <div className="flex items-center gap-1">
