@@ -5,7 +5,6 @@ interface FeedProductCardProps {
   product: Product;
   isFavorited: boolean;
   onFavorite: () => void;
-  onSkip: () => void;
   onContactSeller: () => void;
 }
 
@@ -13,7 +12,6 @@ export default function FeedProductCard({
   product,
   isFavorited,
   onFavorite,
-  onSkip,
   onContactSeller
 }: FeedProductCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -78,21 +76,11 @@ export default function FeedProductCard({
 
       {/* Content overlay */}
       <div className="relative h-full flex flex-col justify-between p-6 text-white">
-        {/* Top section - Category badge */}
+        {/* Top section - Minimal badge */}
         <div className="flex justify-between items-start pt-12">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-full">
-            <span className="text-lg">{getCategoryIcon(product.category || 'Other')}</span>
-            <span className="text-sm font-medium">{product.category || 'Other'}</span>
+          <div className="px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-sm">
+            {getCategoryIcon(product.category || 'Other')} {product.category || 'Other'}
           </div>
-
-          {product.listingType && (
-            <div className="px-3 py-1.5 bg-limin-primary/90 backdrop-blur-md rounded-full">
-              <span className="text-xs font-bold uppercase">
-                {product.listingType === 'wholesale' ? '📦 Wholesale' :
-                 product.listingType === 'local' ? '📍 Local Only' : '✨ Standard'}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Bottom section - Product details */}
@@ -107,66 +95,28 @@ export default function FeedProductCard({
             {product.title}
           </h2>
 
-          {/* Description */}
-          {product.description && (
-            <p className="text-sm text-white/80 line-clamp-3 leading-relaxed">
-              {product.description}
-            </p>
-          )}
-
-          {/* Metadata row */}
-          <div className="flex items-center gap-4 text-sm text-white/70">
-            <div className="flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{product.location || 'Unknown'}</span>
-            </div>
-
-            {product.vehicleCondition && (
-              <div className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{product.vehicleCondition}</span>
-              </div>
-            )}
-
-            {product.createdAt && (
-              <div className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{new Date(product.createdAt).toLocaleDateString()}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Seller info */}
-          <div className="flex items-center gap-3 pt-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-limin-primary to-limin-secondary rounded-full flex items-center justify-center text-white font-bold">
-              {product.seller?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <div>
-              <p className="font-semibold">{product.seller || 'Anonymous'}</p>
-              <p className="text-xs text-white/60">Seller</p>
-            </div>
+          {/* Location - Simple */}
+          <div className="flex items-center gap-2 text-sm text-white/90">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>{product.location || 'Unknown'}</span>
           </div>
         </div>
       </div>
 
       {/* Action buttons - Right side (TikTok style) */}
-      <div className="absolute right-4 bottom-32 flex flex-col gap-6">
+      <div className="absolute right-6 bottom-24 flex flex-col gap-6">
         {/* Favorite button */}
         <button
           onClick={onFavorite}
-          className="flex flex-col items-center gap-1 group"
+          className="flex flex-col items-center gap-1"
         >
           <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
             isFavorited
-              ? 'bg-red-500 scale-110'
-              : 'bg-black/50 backdrop-blur-md hover:bg-black/70 group-hover:scale-110'
+              ? 'bg-red-500'
+              : 'bg-black/40 backdrop-blur-sm hover:bg-black/60'
           }`}>
             <svg
               className="w-7 h-7"
@@ -182,35 +132,18 @@ export default function FeedProductCard({
               />
             </svg>
           </div>
-          <span className="text-xs font-semibold text-white/90">
-            {isFavorited ? 'Saved' : 'Save'}
-          </span>
         </button>
 
         {/* Contact seller button */}
         <button
           onClick={onContactSeller}
-          className="flex flex-col items-center gap-1 group"
+          className="flex flex-col items-center gap-1"
         >
-          <div className="w-14 h-14 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-limin-primary transition-all group-hover:scale-110">
+          <div className="w-14 h-14 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-limin-primary transition-all">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <span className="text-xs font-semibold text-white/90">Chat</span>
-        </button>
-
-        {/* Skip button */}
-        <button
-          onClick={onSkip}
-          className="flex flex-col items-center gap-1 group"
-        >
-          <div className="w-14 h-14 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-black/70 transition-all group-hover:scale-110">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-            </svg>
-          </div>
-          <span className="text-xs font-semibold text-white/90">Skip</span>
         </button>
       </div>
     </div>

@@ -194,9 +194,33 @@ export default function SocialFeedView({
           product={currentProduct}
           isFavorited={favorites.includes(currentProduct.id)}
           onFavorite={handleFavorite}
-          onSkip={handleSkip}
           onContactSeller={() => onContactSeller(currentProduct)}
         />
+      </div>
+
+      {/* Navigation arrows */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-8 flex gap-4 z-50">
+        {/* Previous button */}
+        <button
+          onClick={handlePrevious}
+          disabled={currentIndex === 0}
+          className="w-12 h-12 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+
+        {/* Next button */}
+        <button
+          onClick={handleNext}
+          disabled={currentIndex >= products.length - 1}
+          className="w-12 h-12 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
       </div>
 
       {/* Swipe feedback overlays */}
@@ -224,10 +248,9 @@ export default function SocialFeedView({
 
       {/* Navigation hints (show on first view) */}
       {currentIndex === 0 && (
-        <div className="absolute bottom-20 left-0 right-0 pointer-events-none">
-          <div className="text-center text-white/60 text-sm space-y-2 animate-pulse">
-            <p>👆 Swipe up for next</p>
-            <p>👈 Swipe left to skip • Swipe right to save 👉</p>
+        <div className="absolute bottom-32 left-0 right-0 pointer-events-none">
+          <div className="text-center text-white/70 text-sm animate-pulse">
+            <p>Use arrows to browse • Tap ❤️ to save</p>
           </div>
         </div>
       )}
